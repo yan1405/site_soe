@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+	const produtos = await getCollection("produtos");
+	return produtos.map((produto) => ({
+		params: { slug: produto.id },
+		props: { produto },
+	}));
+}
+
+const { produto } = Astro.props;
+const { Content } = await render(produto);
+
+const imagensDisponiveis = import.meta.glob<{ default: ImageMetadata }>(
+	"/src/assets/produtos/*",
+	{ eager: true },
+);
+
+function resolverImagem(nomeArquivo: string) {
+	return imagensDisponiveis[`/src/assets/produtos/${nomeArquivo}`]?.default;
+}
+---
+
+<BaseLayout title={produto.data.nome}>
+	<h1>{produto.data.nome}</h1>
+
+	{
+		produto.data.imagens.map((nomeArquivo) => {
+			const imagem = resolverImagem(nomeArquivo);
+			return (
+				imagem && (
+					<img
+						src={imagem.src}
+						width={imagem.width}
+						height={imagem.height}
+						alt={produto.data.nome}
+					/>
+				)
+			);
+		})
+	}
+
+	<p>{produto.data.descricaoCurta}</p>
+	<p>R$ {produto.data.preco.toFixed(2)}</p>
+	<p>{produto.data.disponivel ? "Disponível" : "Indisponível"}</p>
+
+	<Content />
+</BaseLayout>
