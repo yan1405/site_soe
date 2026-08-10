@@ -828,3 +828,133 @@ Atualizei `src/components/home/VitrineVideos.astro` para usar os 3 arquivos fina
 Build limpo, 14 páginas (mesmo número — Fase 8 não mexeu em rotas). Conferido no `dist/` gerado: `dist/index.html` referencia só os 3 vídeos finais (`/videos/embalagem-artesanal.mp4`, `/videos/vitrine-experimente-tamanhos.mp4`, `/videos/vitrine-feira.mp4`); `dist/videos/` tem os 4 arquivos (o 4º, `prova-social-scrunchies.mp4`, existe mas não é referenciado em nenhuma página ainda); `dist/videos-raw/` não existe mais.
 
 Fase 8 concluída. Aguardando confirmação explícita do usuário para iniciar a Fase 9 (auditoria final — `/impeccable audit` e `/impeccable critique` sobre o projeto inteiro, agora que as Fases 1–8 estão todas aceitas).
+
+**Decisão do usuário (2026-08-09):** "Pode ir para a fase 9".
+
+---
+
+## Fase 9 — Auditoria final (`/impeccable audit` + `/impeccable critique`) (2026-08-09)
+
+**Antes desta seção**: as Fases 0–8 foram commitadas e enviadas ao GitHub pela primeira vez nesta sessão (`git log` mostrava só o commit da Fase 3 até aqui — nada de Fase 4–8 tinha sido commitado). Commit `162722a` ("Fases 0-8: scaffold, rotas, content collection, design tokens, carrinho, hero 3D, vitrine de vídeos, páginas legais"), push confirmado (`c423c7c..162722a main -> main`). Antes de rodar `git add .`, limpei `.claude/worktrees/` (50MB de cópias órfãs de sub-agentes isolados desta própria Fase 9, já desregistradas do `git worktree list` mas ainda em disco) e adicionei a pasta ao `.gitignore` para não repetir isso.
+
+### 1. `/impeccable audit .` — relatório completo
+
+Setup real:
+```
+node .../impeccable/scripts/context.mjs --target .
+→ NO_PRODUCT_MD / SCOPED_EXISTING_ALLOWED (auditoria de código existente não bloqueia por falta de PRODUCT.md)
+
+node .../impeccable/scripts/detect.mjs --json .
+→ []
+EXIT:0
+```
+
+Rodei também `npx astro check` pela primeira vez nesta sessão — nenhuma fase anterior tinha verificado tipos além de `astro build` (que não faz checagem estrita completa):
+```
+src/components/home/Hero.astro:116:26 - error ts(2339): Property 'clientHeight' does not exist on type 'HTMLElement | null'.
+src/components/home/Hero.astro:116:13 - error ts(2339): Property 'clientWidth' does not exist on type 'HTMLElement | null'.
+src/components/home/Hero.astro:153:30 - warning ts(6387): The signature '(autoStart?): Clock' of 'THREE.Clock' is deprecated.
+src/components/home/Hero.astro:153:30 - warning ts(6385): 'Clock' is deprecated.
+src/components/layout/CartDrawer.astro:55:37 - error ts(7006): Parameter 'item' implicitly has an 'any' type.
+src/components/layout/CartDrawer.astro:55:31 - error ts(7006): Parameter 'soma' implicitly has an 'any' type.
+src/components/layout/CartIcon.astro:23:45 - error ts(7006): Parameter 'item' implicitly has an 'any' type.
+src/components/layout/CartIcon.astro:23:39 - error ts(7006): Parameter 'soma' implicitly has an 'any' type.
+
+Result (26 files): 6 errors, 11 hints
+```
+Causa: `src/lib/cart-store.js`/`config.js`/`consent.js` são `.js` puro (não `.ts`), então sob `strict` os parâmetros de `.reduce()` caem em `any` implícito — viola a promessa de "TypeScript strict" do CLAUDE.md. `Hero.astro` tem um bug real de estreitamento de tipo: a checagem `canvas instanceof HTMLCanvasElement` não persiste dentro da função `redimensionar()` aninhada (comportamento conhecido do TS com `function` declarations vs. arrow functions).
+
+#### Audit Health Score
+
+| # | Dimensão | Nota | Achado-chave |
+|---|---|---|---|
+| 1 | Acessibilidade | 2/4 | Sem landmark `<main>`/skip-link em nenhuma página; `CartDrawer`/`CookieBanner` sem gestão de foco |
+| 2 | Performance | 2/4 | Vídeos da vitrine com `autoplay` incondicional pagam banda antes do scroll-reveal; imagens de produto sem `loading="lazy"` |
+| 3 | Theming | 1/4 | **0% de adoção real** dos tokens da Fase 3 — nenhuma página usa `creme`/`dourado`/etc. |
+| 4 | Responsive | 2/4 | Preflight do Tailwind evita overflow (verificado no CSS gerado), mas nenhum layout responsivo intencional existe ainda |
+| 5 | Implementation Integrity | 2/4 | `astro check` revela 6 erros reais de TS strict nunca detectados; 4 rotas ainda são stubs da Fase 1, 2 linkadas no nav |
+| **Total** | | **9/20** | **Poor — retrabalho maior necessário** |
+
+**Implementation Integrity Verdict: PASS na coerência, FAIL na completude.** O código não é boilerplate genérico — cada arquivo tem comentários rastreando origem/decisão, padrões se repetem de forma consistente. Mas o projeto ainda não entrega as promessas que ele mesmo assume: TypeScript strict (nunca verificado até agora), cobertura de rotas (4 de 12 são stub), e a identidade visual da marca (Fase 3) presente em zero páginas.
+
+#### Achados por severidade
+
+- **[P1] TypeScript strict quebrado silenciosamente desde a Fase 6** — 6 erros reais (acima). Nenhuma fase rodou `astro check`, só `astro build`. Comando sugerido: `/impeccable harden`.
+- **[P1] Theming: 0% de adoção dos tokens da Fase 3** — confirmado por grep, nenhuma classe custom usada em nenhum `.astro`. Causa raiz: o `ORQUESTRACAO_PROMPTS_SOE.md` nunca define uma fase que aplique os tokens aos componentes — a Fase 3 cria, a Fase 9 audita, nada no meio usa. Comando sugerido: `/impeccable polish` (ou fase nova dedicada).
+- **[P1] Rota `/carrinho` é beco sem saída** — está na lista oficial de rotas do CLAUDE.md, renderiza só `<h1>Carrinho</h1>`. O carrinho funciona via drawer, mas não via essa rota dedicada. Comando sugerido: `/impeccable harden`.
+- **[P2] Sem landmark `<main>`/skip-link** em `BaseLayout.astro`. Comando sugerido: `/impeccable harden`.
+- **[P2] `CartDrawer`/`CookieBanner` sem gestão de foco** — abrir não move foco pra dentro, fechar não devolve ao gatilho; `CookieBanner` tem `role="dialog"` sem `aria-modal="true"`. Comando sugerido: `/impeccable harden`.
+- **[P2] Imagens de produto sem `loading="lazy"`** (`ProdutoCard`, `/catalogo`, `/produto/[slug]`). Comando sugerido: `/impeccable optimize`.
+- **[P2] Vídeos da vitrine com `autoplay` incondicional** — `ScrollTrigger.batch` só atrasa a revelação visual; os 3 vídeos (~7MB total) começam a baixar/tocar assim que entram no DOM, independente do scroll. Fix: tirar `autoplay` do `<video>`, chamar `.play()` dentro do mesmo `onEnter`. Comando sugerido: `/impeccable optimize`.
+- **[P2] Cor do Hero 3D duplicada, não referenciada** — `0xbc9a4e` hardcoded no `Hero.astro` (é o `dourado.500` do `tailwind.config.mjs`, mas não importado de lá) — risco de drift. Comando sugerido: `/impeccable document`.
+- **[P3]** `THREE.Clock()` deprecated (aviso do próprio Three.js). **[P3]** Checkbox "Essenciais" do cookie banner usa `disabled` nativo — some da navegação por Tab. **[P3]** `CartIcon` não muda o texto do `aria-label` quando aberto.
+
+#### Achados positivos
+Detector limpo no projeto inteiro; zero `console.log`/TODO/FIXME/lorem ipsum; alt text em toda imagem, aria-label em todo controle icon-only, hierarquia de heading correta nas 14 rotas; pipeline de imagem do Astro correto em todo lugar; otimizações de Three.js e vídeo (Fases 6/8) seguem verificadas de verdade; Tailwind Preflight ativo (confirmado no CSS gerado); todos os placeholders continuam literais no HTML de produção.
+
+### 2. `/impeccable critique .` — relatório completo
+
+**Method: dual-agent** (A: sub-agente isolado, revisão de design com navegador ao vivo + leitura de código-fonte completa · B: sub-agente isolado, `detect.mjs` + evidência de navegador/rede). Sem banner de degradação — os dois rodaram isolados, sem ver o resultado um do outro.
+
+**Nota de processo**: configurei os dois primeiro com `isolation: "worktree"` — erro meu, porque as Fases 4–8 ainda não estavam commitadas e o worktree teria uma cópia desatualizada. Relancei os dois corretamente sem isolamento (essa é a execução "oficial", usada na síntese abaixo). Os dois primeiros completaram mesmo assim e, como usaram navegador ao vivo apontando pro servidor real (não pro worktree), parte do que encontraram continua válida — está na seção "Evidência suplementar" no fim, marcada como tal, não misturada com a síntese oficial.
+
+Servidor de dev usado por todos os 4 agentes: `http://localhost:4325` (subido e parado nesta sessão). Persistência do snapshot: `node critique-storage.mjs slug "."` retornou exit 1 ("no stable slug for input") — alvo de nível raiz, comportamento esperado e documentado no próprio protocolo (`critique.md`, Setup passo 3: "skip persistence... but continue the critique"). Sem trend histórico por isso.
+
+#### Design Health Score
+
+| # | Heurística | Nota | Achado-chave |
+|---|---|---|---|
+| 1 | Visibilidade do status do sistema | 1/4 | Nenhum CTA de compra sequer existe na página de produto |
+| 2 | Correspondência sistema/mundo real | 2/4 | Copy calorosa e correta, mas placeholders literais visíveis (`NUMERO_WHATSAPP_PENDENTE`, `[CNPJ/MEI — PENDENTE]`) |
+| 3 | Controle e liberdade | 3/4 | Banner de cookies com 3 escolhas reais; drawer do carrinho abre/fecha (confirmado via `getComputedStyle`) |
+| 4 | Consistência e padrões | 1/4 | Sameness plana (sem hierarquia nenhuma), não consistência desenhada |
+| 5 | Prevenção de erros | 2/4 | Sem seletor de quantidade; `salvarItens()` sem try/catch |
+| 6 | Reconhecimento vs. recall | 3/4 | Nav com texto, contador visível |
+| 7 | Flexibilidade e eficiência | n/a | Site tipo "Persuade"/vitrine |
+| 8 | Estética e design minimalista | 0/4 | Zero hierarquia visual em qualquer página |
+| 9 | Ajudar a recuperar de erros | 1/4 | 404 sem link de volta; produto sem ação de compra é beco sem saída |
+| 10 | Ajuda e documentação | 0/4 | `/institucional/contato` no nav, promete contato, é `<h1>` vazio |
+| **Total** | | **13/36** | **Poor (36%)** |
+
+#### Design Specificity Verdict
+Não é específico hoje, mas não por falta de trabalho de base — `design-dna.json`/`tailwind.config.mjs` são extração real e específica desta marca, mas `grep -r "class=" src/pages` retorna zero: nada disso chegou a um template. **Convergência entre detector e revisão de LLM**: `detect.mjs` retornou `[]` (0 achados) nas duas execuções — o detector não pega nada porque "zero estilização aplicada a um design system pronto" é julgamento semântico, não padrão mecânico detectável. As duas ferramentas concordam que não há anti-padrão de código; só a revisão simulada percebe que a ausência total de aplicação *é* o problema.
+
+#### Overall Impression
+Base técnica real e documentada (LCP discipline, arquitetura de carrinho sem framework, pipeline de vídeo medido, tokens com proveniência) — mas zero disso chega à experiência que um visitante vê hoje. A maior oportunidade é o vão estrutural entre "tokens prontos" (Fase 3) e "qualquer página estilizada", que nenhuma das 10 fases originais fecha.
+
+#### What's Working
+1. Carrinho→WhatsApp funciona de verdade tecnicamente (confirmado via `getComputedStyle`, não alegação).
+2. Copy de produto já tem voz de marca mesmo sem estilo nenhum.
+3. Banner de cookies eticamente sólido (3 escolhas reais, confirmado funcional pelos dois agentes).
+
+#### Priority Issues
+- **[P0] Zero design aplicado em qualquer página** — marca inteira não comunicada. Causa raiz estrutural: nenhuma fase do plano de 10 fases aplica os tokens da Fase 3 a um componente real.
+- **[P0] Página de produto não tem ação de compra nenhuma** — confirmado por leitura de DOM: só nav + ícone de carrinho são interativos em `/produto/animal-print`. Não é cosmético, é funcionalidade faltando.
+- **[P1] Canvas 3D do Hero cobre a foto do produto** em vez de complementá-la — implementado conforme a letra da Fase 6 ("canvas por cima"), mas o resultado prático contradiz a intenção de imagem-primeiro do CLAUDE.md.
+- **[P1] Três páginas do nav são stubs vazios** (`nossa-historia`, `institucional/contato`, `carrinho`) — vão do próprio `ORQUESTRACAO_PROMPTS_SOE.md`, não erro de execução de fase.
+- **[P1] Placeholders literais aparecem como texto real na tela**, sem tratamento visual que os diferencie de "site quebrado".
+- **[P2] Catálogo e Home mostram os mesmos 5 produtos**, sem diferenciação — mina a proposta de "catálogo curado".
+
+#### Persona Red Flags
+- **Jordan**: abandona em Nossa História/Contato vazios; não encontra nada pra clicar na página de produto; lê os placeholders como "negócio não existe".
+- **Riley**: `salvarItens()` sem try/catch; **evidência de runtime real** (execução suplementar, ver abaixo): vídeo da vitrine tocou até `currentTime≈1,07s` e parou, `.play()` manual não resolveu — não confirmado pela execução B oficial (que só testou status de rede), reportado como sinal a investigar, não bug fechado.
+- **Casey**: **nenhuma das duas execuções conseguiu testar viewport mobile real** — `resize_window` para 390×844 não alterou `window.innerWidth` (ficou em ~1280) em nenhuma tentativa. Buraco de cobertura real, registrado como tal, não "mobile funciona" nem "mobile quebra".
+
+#### Minor Observations
+Nav sem `aria-current`; link sem nome acessível em `/produto/animal-print`; aviso `THREE.Clock deprecated` no console (convergência com o achado do `astro check` do audit).
+
+#### Evidência suplementar (execuções com worktree desatualizado, navegador ao vivo ainda válido)
+- Torus cobrindo a foto do produto: confirmado de forma independente pela Assessment A suplementar (reforça o P1 acima).
+- Vídeos travando após ~1s: confirmado pela Assessment B suplementar via inspeção direta de `video.currentTime`/`video.paused`.
+- As **três** execuções com navegador (as duas B e a A suplementar) relataram a mesma aba sendo navegada sozinha entre páginas sem clique correspondente, e logs de hot-reload do Vite durante os testes — reduz confiança em detalhes pontuais (ex.: fechamento do carrinho na execução suplementar ficou inconclusivo), mas não invalida achados corroborados por mecanismo direto (`getComputedStyle`, contagem de requisições).
+
+### Decisão de prioridade do usuário (2026-08-09)
+
+Registrada aqui antes de qualquer correção começar:
+
+1. **Os dois P0 (zero design aplicado + produto sem CTA de compra) são o MESMO problema, não itens separados.** Não rodar `/impeccable polish` solto — tratar como fase nova e explícita: **"Fase 9.5 — Aplicação do design system aos componentes reais + CTA de compra"**, cobrindo pelo menos: Header, ProdutoCard, `/catalogo`, `/produto/[slug]` (incluindo botão "Adicionar ao carrinho" ou CTA de WhatsApp), Home (todas as seções), Hero (reposicionar o canvas 3D para não cobrir a foto do produto), CartDrawer/CartIcon, e o rodapé com tratamento visual dos placeholders pendentes (sem inventar valor). Documentar essa fase nova no `ORQUESTRACAO_PROMPTS_SOE.md` também — é um vão real do plano original de 10 fases, não um erro de execução.
+2. **Depois**: corrigir os 6 erros de TypeScript strict (`Hero.astro` + `cart-store`/`config`/`consent` sem tipos). Mecânico, não depende de decisão de design.
+3. **Depois**: as 3 páginas stub do nav (Nossa História, Contato, `/carrinho` standalone).
+4. **P2/P3 (landmarks, lazy loading, autoplay de vídeo, `aria-current`) ficam para depois** — baixo retorno numa página ainda sem estilo nenhum.
+
+Fase 9 concluída (auditoria + priorização). **Não iniciei a implementação da Fase 9.5** — só a documentei no `ORQUESTRACAO_PROMPTS_SOE.md` (seção abaixo), por instrução explícita do usuário de esperar revisão de escopo antes de tocar em código.

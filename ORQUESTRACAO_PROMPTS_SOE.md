@@ -16,8 +16,11 @@ Fase 0 (setup)
           → Fase 7 (páginas legais, depende de 1)
   → Fase 8 (pipeline de vídeo — independente, pode rodar a qualquer momento)
   → Fase 9 (auditoria de design — depois de 1 a 7 aceitas)
+      → Fase 9.5 (aplicação do design system + CTA de compra — depende do achado da Fase 9, ver nota abaixo)
   → Fase 10 (segurança — só no pré-deploy ou na integração de pagamento, NÃO agora)
 ```
+
+**Nota sobre a Fase 9.5 (adicionada em 2026-08-09, depois da Fase 9 rodar de verdade):** não estava no plano original de 10 fases. A auditoria (`/impeccable audit .` + `/impeccable critique .`) achou um vão real do próprio plano, não um erro de execução de fase: a Fase 3 cria os tokens de design (`design-dna.json`/`tailwind.config.mjs`), a Fase 9 audita o projeto inteiro, mas **nenhuma fase entre as duas aplica os tokens a um componente real** — confirmado por grep (`class=` custom = 0 ocorrências em `src/pages`) e por inspeção visual ao vivo nas duas avaliações do critique. Os dois achados P0 do critique ("zero design aplicado" e "produto sem ação de compra") foram tratados pelo usuário como o mesmo problema, não itens separados — por isso uma fase nova, não um `/impeccable polish` avulso.
 
 ---
 
@@ -374,6 +377,31 @@ Rode /impeccable audit . e /impeccable critique . (skill impeccable) sobre o pro
 
 Cole no PROGRESS.md a saída literal dos dois comandos — não um resumo seu do que eles encontraram.
 ```
+
+---
+
+## Fase 9.5 — Aplicação do design system aos componentes reais + CTA de compra
+
+**Adicionada em 2026-08-09, depois da Fase 9 rodar de verdade.** Não existia no plano original. Depende do achado da Fase 9 (`/impeccable audit .` + `/impeccable critique .`, ver PROGRESS.md): os dois problemas P0 do critique — "zero design aplicado em qualquer página" e "página de produto sem nenhuma ação de compra" — foram tratados pelo usuário como **o mesmo problema**, não dois itens separados, porque um `/impeccable polish` avulso sobre um projeto sem CSS nenhum não teria em que se apoiar. Por isso é fase própria, com escopo explícito, e não um comando solto.
+
+**Regra de ordem, decidida pelo usuário em 2026-08-09:** dentro desta fase, corrigir primeiro os dois P0 juntos. Só depois — em continuação da mesma revisão de fase, não antes — seguem, nesta ordem:
+1. Os 6 erros de TypeScript strict achados pela Fase 9 (`Hero.astro` + `cart-store.js`/`config.js`/`consent.js` sem tipos) — mecânico, não depende de decisão de design.
+2. As 3 páginas stub do nav principal (`nossa-historia.astro`, `institucional/contato.astro`, `carrinho.astro` como rota standalone).
+3. Os achados P2/P3 da Fase 9 (landmark `<main>`/skip-link, gestão de foco em `CartDrawer`/`CookieBanner`, `loading="lazy"` nas imagens de produto, `autoplay` incondicional dos vídeos da vitrine, `aria-current` no nav) ficam para depois — baixo retorno numa página que ainda não tinha estilo nenhum até este ponto.
+
+**Escopo mínimo dos dois P0 combinados** (definido pelo usuário, aguardando revisão antes de qualquer implementação):
+- `Header.astro`
+- `ProdutoCard.astro`
+- `/catalogo`
+- `/produto/[slug]` — incluindo o botão "Adicionar ao carrinho" ou um CTA de WhatsApp específico do produto (a página de produto hoje não tem nenhuma ação de compra — achado P0 do critique, confirmado por leitura de DOM ao vivo)
+- Home (todas as seções: Hero, Vitrine de Vídeos, Carros-chefe)
+- `Hero.astro` — reposicionar o canvas 3D para não cobrir a foto do produto (achado P1 do critique: o canvas hoje ocupa `inset:0` sobre toda a área da imagem, contradizendo a intenção de "imagem primeiro" do CLAUDE.md)
+- `CartDrawer.astro`/`CartIcon.astro`
+- `Footer.astro` — com tratamento visual dos placeholders pendentes (`[CNPJ/MEI — PENDENTE]` etc.), **sem inventar valor real** para nenhum deles (placeholder continua placeholder — só ganha tratamento visual que o diferencie de "site quebrado", conforme sinalizado no critique)
+
+**Skill a usar:** `impeccable` (`/impeccable shape` e/ou `/impeccable polish`, conforme os comandos sugeridos nos achados P0/P1 do audit/critique da Fase 9 no PROGRESS.md) — aplicando os tokens já existentes em `src/styles/design-dna.json`/`tailwind.config.mjs` (Fase 3), não criando paleta nova.
+
+**Checkpoint:** esta fase não deve começar a ser implementada até o usuário revisar e confirmar o escopo acima explicitamente — registrado assim por instrução direta dele em 2026-08-09.
 
 ---
 
