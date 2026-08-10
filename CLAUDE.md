@@ -53,7 +53,7 @@ A formalização definitiva desses tokens em JSON acontece na Fase 3 (skill `des
 | Placeholder | Motivo |
 |---|---|
 | `[CNPJ/MEI — PENDENTE]` | Status de registro da cliente ainda não confirmado (CNPJ formal / MEI / informal) |
-| `NUMERO_WHATSAPP_PENDENTE` (constante em `src/lib/config.js`) | `w.app/rkoc19` é candidato ao número de produção, ainda não confirmado |
+| `NUMERO_WHATSAPP_PENDENTE` (constante em `src/lib/config.ts`) | Valor atual é FICTÍCIO (`5511900000000`, definido em 2026-08-10) só pra o link/texto não quebrarem em preview; `w.app/rkoc19` é candidato ao número real de produção, ainda não confirmado pela cliente — trocar antes do lançamento |
 | Produtos carro-chefe | As 5 entradas criadas na Fase 2 são provisórias, baseadas nas fotos já corrigidas — lista final ainda não veio da cliente |
 | Gateway de pagamento | Não decidido — carrinho funciona sem ele (consolidação via WhatsApp) |
 
