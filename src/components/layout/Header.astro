@@ -10,16 +10,26 @@ const links = [
 ];
 
 const caminhoAtual = Astro.url.pathname;
+
+// Sessão de responsividade (2026-08-10): o nav era um único <ul flex-wrap>
+// competindo por espaço com a logo e o carrinho na mesma linha — cabia bem
+// em desktop, mas com 4 links + nome da marca + ícone de carrinho não há
+// espaço numa tela de celular, e o flex-wrap quebrava numa pilha feia de
+// botões (achado real do Yan, testando no próprio celular). Abaixo de `md`
+// (768px), o nav horizontal vira um botão de menu hambúrguer que abre um
+// painel — acima de `md`, o nav horizontal volta e o botão some (os dois
+// nunca ficam visíveis ao mesmo tempo, controlado só por CSS/`md:hidden`,
+// sem depender de JS pra decidir qual mostrar).
 ---
 
 <header class="sticky top-0 z-40 border-b border-creme-300 bg-creme-100/95 backdrop-blur-sm">
-	<div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3">
-		<a href="/" class="flex items-center gap-2.5 text-carvao-900" aria-label="SOE Acessórios — página inicial">
+	<div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+		<a href="/" class="flex min-w-0 items-center gap-2.5 text-carvao-900" aria-label="SOE Acessórios — página inicial">
 			<Logo class="h-8 w-8 shrink-0 text-dourado-500" />
-			<span class="font-heading text-lg font-extrabold tracking-tight">SOE Acessórios</span>
+			<span class="truncate font-heading text-lg font-extrabold tracking-tight">SOE Acessórios</span>
 		</a>
 
-		<nav aria-label="Navegação principal" class="flex-1">
+		<nav aria-label="Navegação principal" class="hidden flex-1 md:block">
 			<ul class="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-sm font-medium">
 				{
 					links.map((link) => {
@@ -46,6 +56,130 @@ const caminhoAtual = Astro.url.pathname;
 			</ul>
 		</nav>
 
-		<CartIcon />
+		<div class="flex shrink-0 items-center gap-1">
+			<CartIcon />
+
+			<button
+				id="menu-mobile-toggle"
+				type="button"
+				aria-label="Abrir menu"
+				aria-controls="menu-mobile"
+				aria-expanded="false"
+				class="flex h-11 w-11 items-center justify-center rounded-full text-carvao-900 transition-colors hover:bg-creme-300 md:hidden"
+			>
+				<svg
+					id="icone-menu-abrir"
+					width="22"
+					height="22"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+				>
+					<path d="M4 7h16M4 12h16M4 17h16" />
+				</svg>
+				<svg
+					id="icone-menu-fechar"
+					class="hidden"
+					width="22"
+					height="22"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+				>
+					<path d="M6 6l12 12M18 6L6 18" />
+				</svg>
+			</button>
+		</div>
 	</div>
+
+	<nav
+		id="menu-mobile"
+		aria-label="Navegação mobile"
+		hidden
+		class="border-t border-creme-300 bg-creme-100 px-4 py-3 md:hidden"
+	>
+		<ul class="flex flex-col gap-1 text-base font-medium">
+			{
+				links.map((link) => {
+					const ativo =
+						link.href === "/" ? caminhoAtual === "/" : caminhoAtual.startsWith(link.href);
+					return (
+						<li>
+							<a
+								href={link.href}
+								aria-current={ativo ? "page" : undefined}
+								class:list={[
+									"block rounded-lg px-3 py-2.5 text-carvao-900 transition-colors",
+									ativo ? "bg-creme-300 font-semibold" : "hover:bg-creme-300",
+								]}
+							>
+								{link.label}
+							</a>
+						</li>
+					);
+				})
+			}
+		</ul>
+	</nav>
 </header>
+
+<script>
+	const botao = document.getElementById("menu-mobile-toggle");
+	const menu = document.getElementById("menu-mobile");
+	const iconeAbrir = document.getElementById("icone-menu-abrir");
+	const iconeFechar = document.getElementById("icone-menu-fechar");
+
+	function fecharMenu() {
+		menu?.setAttribute("hidden", "");
+		botao?.setAttribute("aria-expanded", "false");
+		iconeAbrir?.classList.remove("hidden");
+		iconeFechar?.classList.add("hidden");
+	}
+
+	function abrirMenu() {
+		menu?.removeAttribute("hidden");
+		botao?.setAttribute("aria-expanded", "true");
+		iconeAbrir?.classList.add("hidden");
+		iconeFechar?.classList.remove("hidden");
+	}
+
+	botao?.addEventListener("click", () => {
+		if (menu?.hidden) {
+			abrirMenu();
+		} else {
+			fecharMenu();
+		}
+	});
+
+	// Fecha ao navegar por um link do próprio painel (evita o menu ficar
+	// "aberto" na próxima página, já que a navegação recarrega o documento
+	// inteiro — sem isso não tem bug visível, mas é mais correto reiniciar
+	// o estado explicitamente em vez de confiar no reload).
+	menu?.querySelectorAll("a").forEach((link) => {
+		link.addEventListener("click", fecharMenu);
+	});
+
+	document.addEventListener("keydown", (evento) => {
+		if (evento instanceof KeyboardEvent && evento.key === "Escape" && !menu?.hidden) {
+			fecharMenu();
+			botao?.focus();
+		}
+	});
+
+	// Fecha se o usuário girar o celular / redimensionar pra desktop com o
+	// menu aberto — o painel já fica escondido por CSS (md:hidden) acima de
+	// 768px, isso só mantém o estado do ícone/aria-expanded sincronizado.
+	window.addEventListener("resize", () => {
+		if (window.innerWidth >= 768 && !menu?.hidden) {
+			fecharMenu();
+		}
+	});
+</script>

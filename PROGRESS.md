@@ -1253,3 +1253,51 @@ em-dash-overuse 3
 ### Pendência real e nova, criada pela queda da ponte com o dispositivo
 
 A escrita de volta no disco do Yan (`C:\Users\yansi\OneDrive\Documentos\Site_cliente_SOE`) não pôde ser confirmada nesta sessão — a conexão com o computador caiu no meio do trabalho. Os arquivos foram entregues como pacote para download; **é preciso copiá-los manualmente por cima da pasta do projeto antes do próximo `npm install`/`astro build` na sessão local**, e depois `git add`/`git commit` (nada disso foi commitado — só está no pacote entregue).
+
+## Correção de responsividade — header mobile + auditoria geral (2026-08-10)
+
+Fora da numeração de Fases (correção pontual pedida diretamente pelo Yan, não parte do plano de 10 fases). Motivada por um bug real relatado por ele: "na versão mobile o site está com o responsivo errado no header, está com todos os botões um em cima do outro".
+
+**Causa raiz confirmada:** `Header.astro` não tinha nenhum breakpoint — um único `<nav>` com `flex-wrap` competia por espaço com a logo e o ícone de carrinho na mesma linha. Cabia em desktop, mas com 4 links + nome da marca + carrinho não há espaço numa tela de celular, e o `flex-wrap` quebrava numa pilha de botões.
+
+**Correção aplicada em `src/components/layout/Header.astro`:**
+- Nav horizontal (4 links) só visível a partir de `md:` (≥768px) — `hidden md:block`.
+- Abaixo de `md`, um botão de menu hambúrguer (`#menu-mobile-toggle`, ícone que alterna entre hambúrguer e X) abre um painel vertical (`#menu-mobile`) com os 4 links, estado ativo destacado.
+- Painel controlado por `hidden` attribute + `aria-expanded`; fecha ao clicar num link, ao apertar Escape (com foco devolvido ao botão) e ao redimensionar para ≥768px.
+- Ajuste feito durante a verificação: `astro check` acusou `Property 'hidden' does not exist on type 'SVGAttributes'` no ícone X (Astro/TS não permite o atributo `hidden` nativo em `<svg>`, só em elementos HTML) — trocado para `class="hidden"` nesse ícone, e a lógica do `<script>` (`abrirMenu`/`fecharMenu`) ajustada de `setAttribute("hidden")`/`removeAttribute("hidden")` para `classList.add("hidden")`/`classList.remove("hidden")` nos dois ícones, para ficar consistente.
+- Achado adicional durante a auditoria (não era o bug relatado, mas está no mesmo componente): botão hambúrguer e ícone de carrinho estavam em `h-10 w-10` (40×40px) — acima do mínimo WCAG 2.2 AA (24×24px), mas abaixo do alvo de toque recomendado (44×44px, Apple HIG / Material Design). Ajustado os dois para `h-11 w-11` (44×44px) em `Header.astro` e `CartIcon.astro`. Confirmado sem quebrar layout em nenhuma largura testada (320px incluso).
+
+**Verificação — `npx astro check`:**
+```
+Result (28 files):
+- 0 errors
+- 0 warnings
+- 9 hints
+```
+(Os "warnings" que aparecem no output bruto são `ts(6385): 'z' is deprecated` em `content.config.ts`, pré-existentes, não relacionados a esta correção — o resumo final do próprio comando confirma 0 errors/0 warnings.)
+
+**Verificação — `npm run build`:** 14 páginas geradas, `✓ Completed`, sem erros.
+
+**Auditoria de responsividade mais ampla (pedido explícito do Yan: "preciso que você faça uma sessão de responsividade do site para ficar bom em todos os tipos de dispositivos"):**
+
+Metodologia: como a ferramenta `resize_window` do Chrome MCP está confirmadamente quebrada nesta máquina (não altera `window.innerWidth` de verdade — já documentado em fases anteriores), usei uma técnica alternativa: um `<iframe>` de tamanho fixo injetado via `javascript_tool`, testando `iframe.contentDocument.documentElement.scrollWidth` vs `clientWidth` (overflow horizontal real) e capturando screenshots do conteúdo renderizado dentro dele.
+
+Larguras testadas: 320px, 375px, 390px (mobile), 768px, 820px, 1024px (tablet).
+Páginas testadas: `/`, `/catalogo`, `/produto/animal-print`, `/carrinho`, `/nossa-historia`, `/institucional/contato`, `/institucional/privacidade`, `/institucional/termos`, `/institucional/trocas-devolucoes`, `/404`.
+
+Resultado do check automatizado de overflow (`scrollWidth > clientWidth`) em todas as combinações acima:
+```
+[] // nenhuma página com overflow horizontal em nenhuma largura testada
+```
+
+Verificação visual complementar (screenshots reais, não simulados, salvos em `PROGRESS_screenshots/responsividade-2026-08-10/`):
+1. `01-produto-mobile-390px-preco-cta.jpg` — página de produto a 390px: preço em `R$ 34,90` (formato correto, herdado da Fase 9.6), botão "Adicionar ao carrinho" full-width, link de WhatsApp abaixo, sem overflow.
+2. `02-home-mobile-390px-header-fechado.jpg` — home a 390px, header fechado: logo + nome truncando corretamente, ícone de carrinho (com badge de contagem) e hambúrguer lado a lado, sem sobreposição.
+3. `03-home-mobile-390px-menu-hamburguer-aberto.jpg` — menu mobile aberto: painel vertical com os 4 links, "Home" destacado como ativo, ícone alternado para X.
+4. `04-catalogo-tablet-820px-nav-desktop-cookie-banner.jpg` — a 820px (acima do breakpoint `md`): nav horizontal desktop visível, hambúrguer escondido (confirma que os dois nunca aparecem juntos), banner de cookies com os 3 botões ("Aceitar todos", "Rejeitar não essenciais", "Personalizar") lado a lado sem quebrar.
+
+Também testados manualmente (sem screenshot dedicado, comportamento confirmado via DOM/interação): abrir o drawer do carrinho a 390px (painel legível, item com preço formatado corretamente, botão de fechar acessível) e o banner de cookies a 390px (texto e botão "Aceitar todos" sem overflow, botões empilham em telas estreitas).
+
+**Não alterado nesta sessão:** nenhuma página além de `Header.astro` e `CartIcon.astro` precisou de correção — todo o restante do site (herdado da remodelagem da Fase 11, que já usa grids/flex responsivos com `md:`/`sm:` em todos os componentes) já passou na auditoria sem ajuste.
+
+**Pendências desta sessão:** nenhuma bloqueante. Aguardando revisão do Yan antes de commit — mesmo ritmo das Fases 9.5/9.6 (screenshots reais primeiro, commit só depois de aprovação explícita).
