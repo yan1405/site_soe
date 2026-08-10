@@ -1,10 +1,12 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
+import { NUMERO_WHATSAPP_PENDENTE, EMAIL_FICTICIO, PRAZO_REEMBOLSO_DIAS_FICTICIO } from "../../lib/config";
 
 // Rascunho estruturado (CDC art. 49, Decreto 7.962/2013) — NÃO é
 // aconselhamento jurídico, precisa de revisão por advogado antes de
-// produção. Ver CLAUDE.md, "Aviso sobre o conteúdo jurídico".
+// produção. Ver CLAUDE.md, "Aviso sobre o conteúdo jurídico". Remodelagem
+// 2026-08-10: e-mail e prazo fictícios de src/lib/config.ts substituem os
+// placeholders em colchetes.
 ---
 
 <BaseLayout title="Trocas e Devoluções">
@@ -22,7 +24,7 @@ import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
 	<h2>2. Como solicitar</h2>
 	<p>
 		Entre em contato pelo WhatsApp {NUMERO_WHATSAPP_PENDENTE} ou pelo e-mail
-		[E-MAIL_PENDENTE] dentro do prazo de 7 dias corridos, informando o pedido e o motivo
+		{EMAIL_FICTICIO} dentro do prazo de 7 dias corridos, informando o pedido e o motivo
 		da desistência (opcional).
 	</p>
 
@@ -37,7 +39,7 @@ import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
 		Confirmada a devolução dentro do prazo e condições acima, o reembolso será integral,
 		incluindo o valor do frete de envio original, sem qualquer ônus para você. O
 		reembolso é processado pelo mesmo meio de pagamento utilizado na compra, em até
-		[PRAZO_PENDENTE] dias úteis após o recebimento do produto devolvido.
+		{PRAZO_REEMBOLSO_DIAS_FICTICIO} após o recebimento do produto devolvido.
 	</p>
 
 	<h2>5. Trocas por defeito ou vício</h2>

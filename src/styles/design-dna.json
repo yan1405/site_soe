@@ -1,202 +1,66 @@
 {
   "meta": {
-    "name": "SOE Acessórios — Design DNA",
-    "description": "Perfil de Design DNA extraído por análise visual direta das 7 fotos de produto em analise_acessts/fundo_uniformizado/ (5 flatlays de still-life em linho creme + 2 fotos lifestyle de pulso/mão em luz natural), seguindo a skill design-dna (fase Analyze). A cor de fundo creme usa o valor RGB(245,240,228) já medido (não estimado) e registrado no CLAUDE.md do projeto — as demais cores foram amostradas visualmente das 7 fotos. Os campos de design_system.typography, layout, iconography, motion e components não têm evidência direta nas fotos (são still-life de produto, sem UI/texto) — foram inferidos a partir da seção 'Identidade visual' do CLAUDE.md (tipografia script/serifada nos materiais gráficos do Instagram, tom de voz caloroso) e sinalizados como tal.",
-    "source_references": [
-      "analise_acessts/fundo_uniformizado/quadriculado_bege.jpg",
-      "analise_acessts/fundo_uniformizado/laco_linho_verde.jpg",
-      "analise_acessts/fundo_uniformizado/laco_linho_vermelho.jpg",
-      "analise_acessts/fundo_uniformizado/animal_print.jpg",
-      "analise_acessts/fundo_uniformizado/laco_linho_bordado_outono.jpg",
-      "analise_acessts/fundo_uniformizado/apaixonada_e_pouco.jpg",
-      "analise_acessts/fundo_uniformizado/tres_tamanhos.jpg"
-    ],
-    "created_at": "2026-08-09"
+    "name": "SOE Acessórios — Design DNA (v2, remodelagem completa)",
+    "description": "Substitui a v1 (09/08/2026). Mescla explicitamente duas fontes: (A) design-dna.json v1 — cor, mood e princípios de composição extraídos por amostragem de pixel real das 7 fotos de produto da SOE (analise_acessts/fundo_uniformizado/), preservados aqui sem alteração porque são evidência real e são o pedido explícito do Yan ('utilizando nossos tokens'); (B) design-dna-atelieno-referencia.json — tipografia, spacing, grid, sombra e padrões de componente MEDIDOS via computed style ao vivo em https://www.atelieno.com/ em 10/08/2026, usados aqui só como referência de FORMATO/disciplina estrutural, nunca de cor ou tom de voz (pedido explícito do Yan: 'não quero cópia, quero remodelagem'). Cada campo abaixo indica a fonte (SOE-real / Ateliê-Nó-medido / decisão-do-Yan-nesta-sessão) e o motivo da escolha.",
+    "supersedes": "src/styles/design-dna.json v1 (2026-08-09) — arquivo original preservado no histórico do git (commits c423c7c/162722a), não apagado, só substituído em conteúdo.",
+    "created_at": "2026-08-10",
+    "decision_log": [
+      "Cor: 100% SOE-real (paleta amostrada das fotos de produto). Zero cor da referência entrou aqui — pedido explícito do Yan.",
+      "Cantos (border-radius): mantidos os tokens SOE (arredondados) em vez dos cantos retos medidos na referência (0px) — é um dos dois tokens que o Yan pediu para preservar como 'nossos', e cantos orgânicos são coerentes com o produto (laço de linho dobrado, sem aresta reta), diferente da joalheria contemporânea da referência.",
+      "Tipografia: mudança real. A v1 tinha 'script/serifada elegante' marcado como INFERIDO (sem evidência, só suposição a partir do tom do Instagram). A referência mediu, com evidência real (computed style), que um site do mesmo território de marca não usa nenhuma serifa em lugar nenhum — hierarquia vem 100% de peso/escala, não de categoria de fonte. Decisão: parar de tratar a suposição não verificada como fato. Em vez de copiar as fontes exatas da referência (Poppins + Avenir, o que seria cópia literal), a SOE passa a usar só 'Work Sans' (já licenciada e self-hospedada no projeto) em dois pesos extremos (300 para corpo, 800 para heading) — aplicando a LIÇÃO estrutural (contraste por peso) sem copiar a fonte. 'Playfair Display' (já no projeto) deixa de ser a fonte de heading padrão e passa a acento raríssimo (uma citação/destaque por página, no máximo) — mantém um traço 'feito à mão' sem contradizer a evidência real.",
+      "Sombra: reduzida. A referência mediu 0 (zero) box-shadow em qualquer elemento — toda separação de seção vem de blocos de cor sólida alternados. A v1 da SOE usava sombra como recurso primário de hierarquia. Decisão: manter os 3 tokens de sombra da SOE (não descartar, são 'nossos'), mas rebaixá-los a uso funcional restrito (drawer do carrinho, hover de card), e adotar blocos de cor alternados (creme/branco/creme) como principal separador de seção na Home — é o padrão estrutural mais forte e mais citável da referência.",
+      "Componentes (card de produto): a referência mostrou 'sem chrome' — produto flutua direto no fundo, sem borda/sombra/fundo de card, nome+preço alinhados à esquerda abaixo da imagem. Adotado parcialmente: cards da SOE perdem a sombra 'low' constante (só aparece no hover) e o fundo 'creme-50' vira opcional/mais sutil: a foto do produto passa a ser o elemento dominante do card, texto abaixo em vez de sobreposto.",
+      "CTA e tom de voz: NÃO adotado da referência. A referência mede tom 'direto e afirmativo' (Comprar, Adicionar ao Carrinho, imperativo puro) — o design-dna.json v1 da SOE já tinha 'friendly invitation' como decisão de marca (Ver no WhatsApp), e o CLAUDE.md do projeto reforça isso. Mantido 100% o tom SOE.",
+      "Layout de carrossel: adotado da referência para a seção 'Carros-chefe' da Home (scroll horizontal com produtos, como o 'Mais Vendidos' medido em atelieno.com) — é um FORMATO, não conteúdo nem cor, e resolve melhor a curadoria pequena (5 produtos) do que um grid estático. /catalogo continua em grid (mostra os mesmos 5, mas em contexto de 'ver tudo', onde grid é mais adequado que carrossel)."
+    ]
   },
   "design_system": {
     "color": {
-      "palette_type": "analogous",
-      "primary": {
-        "hex": "#BC9A4E",
-        "role": "dourado — cor de identidade, amostrada do fio de bordado dourado e das espigas de trigo seco presentes em quase todas as flatlays; é o tom quente que costura as 7 fotos entre si"
-      },
-      "secondary": {
-        "hex": "#4B5842",
-        "role": "oliva — amostrado do laço de linho verde-escuro (laco_linho_verde.jpg); cor de profundidade/ancoragem que equilibra o resto da paleta clara"
-      },
-      "accent": {
-        "hex": "#B7272B",
-        "role": "vermelho — amostrado dos laços vermelhos (laco_linho_vermelho.jpg, tres_tamanhos.jpg); é o tom mais saturado das 7 fotos, com maior potencial de uso em CTA por contraste com o fundo creme"
-      },
-      "neutral": {
-        "scale": [
-          "#FBF9F3",
-          "#F5F0E4",
-          "#EAE0C9",
-          "#DCCBA0",
-          "#B9A06A",
-          "#8B7548",
-          "#2E2A24"
-        ],
-        "usage": "#F5F0E4 é o fundo medido (não estimado) do still-life de produto — usado como creme/base de superfície. #2E2A24 (carvão) vem das sombras mais escuras e do contraste pontual mencionado no CLAUDE.md; os tons intermediários são interpolação entre os dois extremos observados nas fotos."
-      },
-      "semantic": {
-        "success": "#4B5842",
-        "warning": "#BC9A4E",
-        "error": "#B7272B",
-        "info": "#7C8A93"
-      },
-      "surface": {
-        "background": "#F5F0E4",
-        "card": "#FBF9F3",
-        "elevated": "#FFFFFF"
-      },
-      "contrast_strategy": "dark-on-light dominant — texto/ícones em carvão (#2E2A24) sobre fundo creme (#F5F0E4); cores saturadas (dourado, terracota, oliva, vermelho) usadas em blocos pequenos (bordado, CTA, badges), nunca como fundo de área grande, replicando a proporção observada nas fotos (linho creme domina >80% do enquadramento, cor viva só no produto)",
-      "notes": "Duas cores adicionais nomeadas foram pedidas explicitamente e amostradas das fotos, além de primary/secondary/accent: terracota (#A85D35, das espigas secas e do bordado outono em laco_linho_bordado_outono.jpg) e rosa-suave (#E3C6C2, do scrunchie xadrez rosa em apaixonada_e_pouco.jpg)."
+      "source": "SOE-real (inalterado da v1) — ver tailwind.config.mjs para a escala completa (creme, dourado, terracota, oliva, rosa-suave, carvão, vermelho)",
+      "primary": { "hex": "#BC9A4E", "role": "dourado — identidade, CTA principal" },
+      "secondary": { "hex": "#4B5842", "role": "oliva — profundidade/ancoragem" },
+      "accent": { "hex": "#B7272B", "role": "vermelho — maior saturação, uso pontual" },
+      "surface": { "background": "#F5F0E4", "card": "#FBF9F3", "elevated": "#FFFFFF" },
+      "contrast_strategy": "dark-on-light — carvão sobre creme, cor saturada só em blocos pequenos, nunca fundo de área grande (igual v1)"
     },
     "typography": {
-      "type_scale": {
-        "display": { "size": "3.5rem", "weight": "600", "line_height": "1.1", "tracking": "-0.01em" },
-        "heading_1": { "size": "2.5rem", "weight": "600", "line_height": "1.15", "tracking": "-0.01em" },
-        "heading_2": { "size": "2rem", "weight": "600", "line_height": "1.2", "tracking": "normal" },
-        "heading_3": { "size": "1.5rem", "weight": "500", "line_height": "1.3", "tracking": "normal" },
-        "body": { "size": "1rem", "weight": "400", "line_height": "1.6", "tracking": "normal" },
-        "body_small": { "size": "0.875rem", "weight": "400", "line_height": "1.5", "tracking": "normal" },
-        "caption": { "size": "0.75rem", "weight": "400", "line_height": "1.4", "tracking": "0.02em" },
-        "overline": { "size": "0.75rem", "weight": "600", "line_height": "1.4", "tracking": "0.08em" }
-      },
+      "source": "decisão-do-Yan-nesta-sessão, informada pela medição real da referência (ver decision_log)",
       "font_families": {
-        "heading": "script/serifada elegante (ex: 'Playfair Display' ou script comercial equivalente à identidade do Instagram @soefloripa) — INFERIDO do CLAUDE.md, não visível nas 7 fotos analisadas (fotos são still-life sem tipografia)",
-        "body": "sans-serif humanista legível (ex: 'Inter', 'Work Sans') — INFERIDO, para contraste funcional com a serifada de heading",
-        "mono": "não observado/não aplicável — sem evidência de uso de monoespaçada na marca"
+        "heading": "'Work Sans' peso 700–800 (não mais Playfair Display como padrão) — sans-serif, mesma família do corpo, contraste só por peso/escala, como a evidência real da referência mostrou ser o padrão do território de marca",
+        "body": "'Work Sans' peso 300–400 — inalterado, já era a escolha da v1",
+        "accent_decorativo": "'Playfair Display' itálico — reservado a no máximo 1 elemento de destaque por página (citação em Nossa História, olho-eyebrow do Hero), nunca corpo de texto nem heading padrão"
       },
-      "font_style_notes": "serifada/script elegante no heading (afetivo, feito-à-mão) + sans-serif humanista no corpo, para legibilidade em blocos de descrição de produto. Este par é inferido do tom de voz e da tipografia de marca descrita no CLAUDE.md — as fotos analisadas não contêm texto para confirmar visualmente."
+      "type_scale": {
+        "display": { "size": "3.5rem", "weight": "800", "line_height": "1.05", "tracking": "-0.01em" },
+        "heading_1": { "size": "2.5rem", "weight": "800", "line_height": "1.1", "tracking": "-0.01em" },
+        "heading_2": { "size": "2rem", "weight": "700", "line_height": "1.15", "tracking": "-0.01em" },
+        "heading_3": { "size": "1.375rem", "weight": "700", "line_height": "1.25", "tracking": "normal" },
+        "overline": { "size": "0.8125rem", "weight": "700", "line_height": "1.4", "tracking": "0.12em", "transform": "uppercase" },
+        "body": { "size": "1rem", "weight": "400", "line_height": "1.65" },
+        "body_small": { "size": "0.875rem", "weight": "400", "line_height": "1.55" }
+      }
     },
-    "spacing": {
-      "base_unit": "4px",
-      "scale": [4, 8, 12, 16, 24, 32, 48, 64, 96],
-      "content_density": "spacious",
-      "section_rhythm": "generoso e consistente — nas 5 flatlays, o produto ocupa uma fração pequena do enquadramento com bastante linho/negativo ao redor; nas 2 fotos lifestyle, o mesmo princípio se repete com bastante parede/madeira clara ao redor do pulso. Essa proporção generosa de espaço negativo em torno de um elemento central é o padrão a replicar entre seções do site."
+    "spacing": { "source": "SOE-real, inalterado — scale [4,8,12,16,24,32,48,64,96], densidade 'spacious'" },
+    "shape": { "source": "SOE-real, mantido por decisão explícita do Yan — small 6px / medium 12px / large 24px / pill 9999px" },
+    "elevation": {
+      "source": "híbrido — tokens SOE mantidos, uso rebaixado por disciplina medida na referência (zero sombra como separador de seção)",
+      "usage_policy": "sombra só em: hover de card de produto, CartDrawer/CookieBanner (camadas flutuantes reais). Seções da página usam blocos de cor alternados (creme-100/branco/creme-100), não sombra, para criar ritmo."
     },
     "layout": {
-      "grid_system": "INFERIDO (não visível em fotos de produto) — grid de 12 colunas, comum para vitrine de e-commerce leve",
+      "source": "SOE-real (max-width, grid, breakpoints) + Ateliê-Nó-medido (padrão de carrossel na Home)",
       "max_content_width": "1280px",
-      "columns": "12",
-      "gutter": "24px",
-      "breakpoints": { "sm": "640px", "md": "768px", "lg": "1024px", "xl": "1280px" },
-      "alignment_tendency": "centered — todas as 7 fotos centralizam o produto/pulso no quadro com composição levemente assimétrica (produto deslocado do centro geométrico, mas ainda dominante), sugerindo hero/seções centralizadas com respiro assimétrico pontual"
-    },
-    "shape": {
-      "border_radius": {
-        "small": "6px",
-        "medium": "12px",
-        "large": "24px",
-        "pill": "9999px"
-      },
-      "border_usage": "none — nenhuma linha reta ou borda rígida aparece nas fotos; os laços são orgânicos, dobrados, sem arestas retas",
-      "divider_style": "subtle — se necessário, linha 1px em creme-700/oliva com baixa opacidade, nunca preto puro"
-    },
-    "elevation": {
-      "shadow_style": "soft diffused",
-      "levels": {
-        "low": "0 1px 2px rgba(46,42,36,0.06)",
-        "medium": "0 4px 12px rgba(46,42,36,0.10)",
-        "high": "0 12px 32px rgba(46,42,36,0.14)"
-      },
-      "depth_cues": "shadows suaves + luz natural direcional — todas as 7 fotos usam luz solar lateral/natural com sombra suave difusa (nunca sombra dura de flash), reforçando 'soft diffused' como o único estilo de sombra coerente com a identidade"
-    },
-    "iconography": {
-      "style": "line — INFERIDO, para consistência com a leveza do traço orgânico dos laços; sem evidência direta nas fotos (nenhum ícone presente)",
-      "stroke_weight": "1.5px",
-      "size_scale": [16, 20, 24, 32],
-      "preferred_set": "custom/linha fina, sem sugestão de biblioteca específica ainda"
-    },
-    "motion": {
-      "easing": "ease-out suave (cubic-bezier(0.16, 1, 0.3, 1)) — INFERIDO, compatível com o requisito do CLAUDE.md de respeitar prefers-reduced-motion e não competir com o produto",
-      "duration_scale": { "micro": "150ms", "normal": "400ms", "macro": "800ms" },
-      "entrance_pattern": "fade + leve slide-up, nunca bounce — para manter o tom caloroso/artesanal sem parecer 'gamificado'",
-      "exit_pattern": "fade-out simples",
-      "philosophy": "minimal functional — a animação existe para revelar conteúdo (vídeos, scroll), nunca chama mais atenção que a foto do produto"
+      "home_carros_chefe": "carrossel horizontal com scroll-snap (inspirado no carrossel 'Mais Vendidos' medido na referência)",
+      "catalogo": "grid regular (inalterado)"
     },
     "components": {
-      "button_style": "INFERIDO — preenchido em dourado/terracota sobre fundo creme, cantos arredondados (medium/large radius), sem sombra dura",
-      "input_style": "INFERIDO — borda fina 1px em tom neutro, fundo branco/creme-50, foco em dourado",
-      "card_style": "fundo creme-50/branco, sombra 'low', cantos 'medium', imagem de produto ocupando a maior área do card — refletindo a composição das flatlays (produto grande, fundo mínimo)",
-      "navigation_pattern": "header fixo simples, fundo creme translúcido, sem mega-menu — coerente com site pequeno/vitrine, não catálogo completo",
-      "modal_style": "INFERIDO — CartDrawer lateral (já definido na arquitetura do CLAUDE.md), fundo branco/creme-50, sombra 'high'",
-      "list_style": "grid de cards (catálogo/carros-chefe), não lista densa — reflete a curadoria pequena do catálogo (regra fixa do CLAUDE.md: nunca listar o catálogo inteiro)",
-      "component_notes": "Campos desta subseção (components) não têm evidência fotográfica direta — são inferência de UI a partir da arquitetura já confirmada no CLAUDE.md, sinalizado explicitamente para não ser confundido com extração visual."
+      "card_style": "Ateliê-Nó-medido, adaptado: sem sombra permanente (só hover), foto do produto dominante, nome+preço alinhados à esquerda abaixo da imagem — mas mantendo cantos arredondados (token SOE) e o botão de comprar visível (a referência omite isso, mas o CLAUDE.md exige CTA de compra visível — achado P0 da Fase 9)",
+      "button_style": "SOE-real mantido — pill dourado, tom convite ('Ver no WhatsApp', 'Adicionar ao carrinho'), nunca imperativo agressivo"
     }
   },
   "design_style": {
-    "aesthetic": {
-      "mood": ["caloroso", "artesanal", "afetivo", "delicado", "aconchegante"],
-      "visual_metaphor": "still-life de ateliê — linho, flor seca, luz de janela",
-      "era_influence": "cottagecore contemporâneo / editorial artesanal",
-      "genre": "e-commerce artesanal indie, tom editorial",
-      "personality_traits": ["acolhedora", "cuidadosa", "sem pressa", "genuína"],
-      "adjectives": ["quente", "orgânico", "feito à mão", "delicado", "natural"]
-    },
-    "visual_language": {
-      "complexity": "minimal",
-      "ornamentation": "subtle accents",
-      "whitespace_usage": "generoso e intencional — linho/parede ocupam a maior parte do quadro em todas as 7 fotos",
-      "visual_weight_distribution": "single hero element off-center, resto do quadro é respiro",
-      "focal_strategy": "single hero element",
-      "contrast_level": "moderado — cor viva pontual sobre fundo claro dominante",
-      "texture_usage": "alta — linho amassado, bordado à mão, fios visíveis, madeira e pele são texturas centrais em todas as 7 fotos, não decoração incidental"
-    },
-    "composition": {
-      "hierarchy_method": "spatial isolation",
-      "balance_type": "asymmetric",
-      "flow_direction": "diagonal — em 6 das 7 fotos o produto está posicionado em diagonal no quadro, não centralizado/eixo reto",
-      "grouping_strategy": "produto único isolado nas 5 flatlays; grupo de acessórios empilhados no pulso nas 2 fotos lifestyle",
-      "negative_space_role": "protagonista — o espaço vazio de linho/parede é tão intencional quanto o produto, não é 'sobra'"
-    },
-    "imagery": {
-      "photo_treatment": "luz natural quente, still-life em linho creme (produto) e lifestyle em luz de janela (prova social); sem filtro pesado, cores fiéis ao tecido",
-      "illustration_style": "não aplicável — nenhuma ilustração observada nas fotos, só fotografia",
-      "graphic_elements": "espiga/flor seca como elemento recorrente de still-life (5 das 7 fotos)",
-      "pattern_usage": "estampas do próprio produto (xadrez, animal print, floral bordado) — não há padrão gráfico de UI, o padrão vem do tecido",
-      "image_shape": "retangular full-bleed, sem moldura ou cantos arredondados na foto em si"
-    },
-    "interaction_feel": {
-      "feedback_style": "sutil, sem exagero",
-      "hover_behavior": "leve escala/leve sombra, nunca cor saturada de fundo",
-      "transition_personality": "fade-subtle",
-      "loading_style": "skeleton discreto em tom creme, sem spinner chamativo",
-      "microinteraction_density": "baixa — coerente com a calma das fotos, poucas mas bem cuidadas"
-    },
-    "brand_voice_in_ui": {
-      "tone": "caloroso, afetivo, português informal-cuidadoso — direto do CLAUDE.md",
-      "formality": "informal-cuidadoso",
-      "cta_style": "friendly invitation (ex: 'Ver no WhatsApp', não 'Comprar agora!!' agressivo)",
-      "empty_state_approach": "acolhedor, com linguagem pessoal, nunca técnico/frio",
-      "error_tone": "gentil, sem culpar o usuário"
-    }
+    "source": "SOE-real, inalterado — mood caloroso/artesanal/afetivo; a referência não contribui nada aqui (é editorial/urbana/joalheria, oposto do território SOE)."
   },
   "visual_effects": {
-    "overview": {
-      "effect_intensity": "none",
-      "performance_tier": "lightweight",
-      "fallback_strategy": "disable effects (respeita prefers-reduced-motion, requisito não-negociável do CLAUDE.md)",
-      "primary_technology": "CSS only"
-    },
-    "background_effects": { "type": "none", "description": "Nenhum efeito de fundo observado — as 7 fotos são fotografia estática, sem elementos gerativos ou animados.", "technology": "n/a", "params": { "color_palette": [], "speed": "n/a", "density": "n/a", "opacity": "n/a", "blend_mode": "n/a" } },
-    "particle_systems": { "enabled": false, "type": "none", "description": "Não observado nas fotos-fonte.", "technology": "n/a", "params": { "count": "0", "shape": "n/a", "size_range": "n/a", "movement_pattern": "n/a", "color_behavior": "n/a", "interaction": "none", "spawn_area": "n/a" } },
-    "3d_elements": { "enabled": false, "type": "none", "description": "As fotos analisadas nesta fase são still-life 2D — não há elemento 3D nas referências. O Hero 3D do CLAUDE.md era requisito de arquitetura futura (Fase 6), não algo extraído destas fotos — implementado na Fase 6, e removido por completo na Fase 9.6 (2026-08-10, decisão do Yan): o canvas contrariava os próprios campos `visual_language.focal_strategy` e `composition.negative_space_role` deste mesmo arquivo (ver abaixo). Esse requisito de arquitetura não existe mais.", "technology": "n/a", "params": { "renderer": "n/a", "lighting": "n/a", "camera": "n/a", "materials": "n/a", "geometry": "n/a", "post_processing": [], "interaction_model": "n/a" } },
-    "shader_effects": { "enabled": false, "type": "none", "description": "Não observado.", "technology": "n/a", "params": { "uniforms": "n/a", "vertex_manipulation": "n/a", "fragment_output": "n/a", "noise_type": "n/a", "distortion": "n/a" } },
-    "scroll_effects": {
-      "parallax": { "enabled": false, "layers": "0", "depth_range": "n/a", "speed_curve": "n/a" },
-      "scroll_triggered_animations": { "enabled": true, "trigger_points": "entrada de seção (viewport 80%)", "animation_type": "fade-up", "scrub_behavior": "não-scrubbed, dispara uma vez ao entrar — coerente com 'motion.philosophy: minimal functional' e com a Vitrine de Vídeos da Fase 5 (GSAP/ScrollTrigger, revelação progressiva)" },
-      "scroll_morphing": { "enabled": false, "description": "Não observado/não planejado." }
-    },
-    "text_effects": { "type": "none", "description": "Nenhum efeito de texto nas fotos-fonte (não há texto nelas).", "technology": "n/a", "params": { "split_strategy": "n/a", "animation_per_unit": "n/a", "stagger": "n/a", "effect_style": "n/a" } },
-    "cursor_effects": { "enabled": false, "type": "none", "description": "Não observado/não planejado — foge do tom acolhedor e sutil da marca.", "params": { "shape": "n/a", "size": "n/a", "blend_mode": "n/a", "trail": "n/a", "interaction_zone": "n/a" } },
-    "image_effects": { "type": "hover-transform-only", "description": "leve zoom/escala na imagem de produto ao passar o mouse, replicando o convite tátil das fotos de still-life", "technology": "CSS transform", "params": { "filter_pipeline": "none", "hover_transform": "scale(1.03)", "reveal_animation": "fade-in on load", "distortion_type": "none" } },
-    "glassmorphism_neumorphism": { "enabled": false, "style": "none", "params": { "blur_radius": "n/a", "transparency": "n/a", "border_treatment": "n/a", "shadow_type": "n/a", "light_source_angle": "n/a" } },
-    "canvas_drawings": { "enabled": false, "type": "none", "description": "Não observado.", "technology": "n/a", "params": { "draw_method": "n/a", "animation_loop": "n/a", "color_scheme": "n/a", "responsiveness": "n/a", "interaction": "n/a" } },
-    "svg_animations": { "enabled": false, "type": "none", "description": "Não observado.", "params": { "animation_method": "n/a", "path_morphing": "n/a", "stroke_animation": "n/a", "filter_effects": "n/a" } },
-    "composite_notes": "As 7 fotos-fonte são fotografia still-life/lifestyle estática — não contêm nenhum efeito visual de tela (WebGL, partículas, shaders). O 'overview.effect_intensity: none' reflete isso com precisão: esta camada do Design DNA está, por natureza da fonte, quase vazia de conteúdo extraído e majoritariamente povoada com decisões conservadoras consistentes com o tom 'caloroso e sem pressa' da marca (ex: scroll-reveal sutil, sem parallax, sem cursor customizado). O Hero 3D (Fase 6) e a Vitrine de Vídeos com ScrollTrigger (Fase 5) já são requisitos arquiteturais definidos no CLAUDE.md, não algo derivado desta análise de imagem — citados aqui só para não haver contradição entre esta camada e as fases futuras do projeto."
+    "source": "SOE-real, inalterado — sem Canvas/WebGL/partículas. Vitrine de vídeos (GSAP/ScrollTrigger) mantida como já implementada na Fase 5, só reposicionada se necessário nesta remodelagem."
   }
 }

@@ -1,21 +1,35 @@
 // Cores extraídas do Design DNA (src/styles/design-dna.json), gerado pela skill
 // design-dna a partir das 7 fotos em analise_acessts/fundo_uniformizado/.
 // Extensão do tema — não sobrescreve as cores padrão do Tailwind.
+//
+// Remodelagem 2026-08-10 (design-dna.json v2, ver decision_log): tipografia
+// deixa de usar Playfair Display como fonte de heading padrão. Motivo real,
+// não estético: a extração de Design DNA de um site de referência real
+// (design-dna-atelieno-referencia.json, medido via computed style ao vivo)
+// mostrou que hierarquia tipográfica em sites do mesmo território de marca
+// vem de peso/escala, não de mistura serifada/sans — a suposição original
+// "script/serifada elegante" nunca teve evidência (v1 marcava isso como
+// INFERIDO). "Work Sans" (já licenciada e self-hospedada no projeto) agora
+// cobre heading (700-800) e corpo (300-400) na mesma família — cor e tom de
+// voz continuam 100% da SOE, nada da referência entrou aí.
 
 /** @type {import('tailwindcss').Config} */
 export default {
 	content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
 	theme: {
 		extend: {
-			// Fase 9.5: fontes reais, self-hospedadas (public/fonts/), não CDN nem
-			// fonte de sistema — script/serifada pro heading, humanista pro corpo,
-			// como o design-dna.json já pedia desde a Fase 3.
 			fontFamily: {
-				heading: ['"Playfair Display"', "Georgia", "serif"],
+				heading: ['"Work Sans"', "-apple-system", "Segoe UI", "sans-serif"],
 				body: ['"Work Sans"', "-apple-system", "Segoe UI", "sans-serif"],
+				// Acento decorativo raríssimo (citação, olho do Hero) — nunca heading
+				// padrão nem corpo de texto. Ver design-dna.json v2, decision_log.
+				acento: ['"Playfair Display"', "Georgia", "serif"],
 			},
 			// Sombras com o mesmo rgba tingido de carvão do design-dna.json —
-			// nunca preto puro genérico.
+			// nunca preto puro genérico. Uso rebaixado a elementos flutuantes
+			// reais (drawer, hover de card) — seções usam blocos de cor
+			// alternados como separador primário, não sombra (ver design-dna.json
+			// v2: a referência mediu 0 box-shadow em qualquer elemento do site).
 			boxShadow: {
 				low: "0 1px 2px rgba(46,42,36,0.06)",
 				medium: "0 4px 12px rgba(46,42,36,0.10)",

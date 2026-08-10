@@ -4,6 +4,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import ProdutoCard from "../components/produto/ProdutoCard.astro";
 import VitrineVideos from "../components/home/VitrineVideos.astro";
 import Hero from "../components/home/Hero.astro";
+import { NUMERO_WHATSAPP_PENDENTE } from "../lib/config";
 
 const produtos = await getCollection("produtos");
 const carrosChefe = produtos.filter((produto) => produto.data.destaqueHome);
@@ -16,6 +17,10 @@ const imagensDisponiveis = import.meta.glob<{ default: ImageMetadata }>(
 function resolverImagem(nomeArquivo: string) {
 	return imagensDisponiveis[`/src/assets/produtos/${nomeArquivo}`]?.default;
 }
+
+const mensagemWhatsAppCatalogo = encodeURIComponent(
+	"Olá! Vi o site da SOE e queria ver mais opções além do catálogo.",
+);
 ---
 
 <BaseLayout title="Início">
@@ -25,32 +30,124 @@ function resolverImagem(nomeArquivo: string) {
 	<!-- Seção 2: Vitrine de vídeos -->
 	<VitrineVideos />
 
-	<!-- Seção 3: Carros-chefe -->
-	<section class="mx-auto max-w-6xl px-6 py-16">
-		<h2 class="text-carvao-900">Carros-chefe</h2>
-		<p class="mt-2 max-w-xl text-carvao-700">Os favoritos do ateliê — feitos à mão, em pequenos lotes.</p>
-		<ul class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-			{
-				carrosChefe.map((produto) => {
-					const imagem = resolverImagem(produto.data.imagens[0]);
-					return (
-						<ProdutoCard
-							slug={produto.id}
-							nome={produto.data.nome}
-							descricaoCurta={produto.data.descricaoCurta}
-							preco={produto.data.preco}
-							disponivel={produto.data.disponivel}
-							imagemSrc={imagem?.src}
-							imagemWidth={imagem?.width}
-							imagemHeight={imagem?.height}
-						/>
-					);
-				})
-			}
-		</ul>
+	<!-- Seção 3: Carros-chefe.
+	     Remodelagem 2026-08-10 (design-dna.json v2, layout.home_carros_chefe):
+	     grid estático virou carrossel horizontal com scroll-snap — formato
+	     emprestado do carrossel "Mais Vendidos" medido na referência
+	     (design-dna-atelieno-referencia.json), aplicado ao conteúdo/cor da
+	     SOE. /catalogo continua em grid, que é o formato certo pra "ver tudo".
+	     Correção 2026-08-10: rótulo "Curadoria pequena" acima do título
+	     removido — achado real do `impeccable detect`, ver Hero.astro. -->
+	<section class="bg-creme-100 py-16" aria-label="Carros-chefe">
+		<div class="mx-auto max-w-6xl px-6">
+			<h2 class="text-carvao-900">Carros-chefe: curadoria pequena</h2>
+			<p class="mt-2 max-w-md text-carvao-700">
+				Os favoritos do ateliê, feitos à mão em pequenos lotes. O catálogo completo fica no
+				nosso WhatsApp.
+			</p>
+			<ul class="carrossel-scroll mt-8 flex gap-6 overflow-x-auto pb-4">
+				{
+					carrosChefe.map((produto) => {
+						const imagem = resolverImagem(produto.data.imagens[0]);
+						return (
+							<ProdutoCard
+								slug={produto.id}
+								nome={produto.data.nome}
+								descricaoCurta={produto.data.descricaoCurta}
+								preco={produto.data.preco}
+								disponivel={produto.data.disponivel}
+								imagemSrc={imagem?.src}
+								imagemWidth={imagem?.width}
+								imagemHeight={imagem?.height}
+								class="carrossel-item w-64 shrink-0"
+							/>
+						);
+					})
+				}
+			</ul>
+		</div>
 	</section>
 
-	<!-- Seção 4: Prova social -->
-	<!-- Seção 5: Teaser Nossa História -->
-	<!-- Seção 6: CTA final + rodapé -->
+	<!-- Seção 4: Prova social.
+	     Remodelagem 2026-08-10: antes era um comentário HTML vazio (achado
+	     real do DIAGNOSTICO_DESIGN_2026-08-10.md, item 1). Em vez de inventar
+	     depoimentos com nomes de clientes fictícios (o que seria um dado
+	     fabricado se apresentado como avaliação real), a prova social usa o
+	     vídeo real de bastidor (prova-social-scrunchies.mp4, já existente em
+	     public/videos/ desde a Fase 8) e convida pro Instagram real
+	     (@soefloripa) — prova social honesta, sem fabricar texto. -->
+	<section class="bg-white py-16" aria-label="Prova social">
+		<div class="mx-auto grid max-w-6xl items-center gap-10 px-6 md:grid-cols-2">
+			<div class="overflow-hidden rounded-2xl bg-creme-300">
+				<video
+					class="aspect-[9/16] w-full max-w-xs object-cover md:max-w-none"
+					src="/videos/prova-social-scrunchies.mp4"
+					poster="/images/poster-prova-social-scrunchies.jpg"
+					muted
+					loop
+					playsinline
+					preload="none"
+					autoplay
+					aria-label="Vídeo de bastidor mostrando os produtos da SOE Acessórios em uso"
+				/>
+			</div>
+			<div class="flex flex-col gap-4">
+				<h2 class="text-carvao-900">De verdade, sem pressa</h2>
+				<p class="max-w-sm text-carvao-700">
+					Mostramos o processo real: corte, bordado, embalagem. É assim que a SOE trabalha
+					desde sempre. Acompanhe o dia a dia do ateliê no Instagram.
+				</p>
+				<a
+					href="https://www.instagram.com/soefloripa"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="mt-2 inline-flex w-fit items-center gap-2 text-sm font-semibold text-carvao-900 underline decoration-dourado-500 underline-offset-4 hover:text-terracota-700"
+				>
+					Ver @soefloripa no Instagram
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- Seção 5: Teaser Nossa História.
+	     Remodelagem 2026-08-10: antes era comentário vazio. Reaproveita a
+	     abertura real de /nossa-historia (não inventa uma história nova),
+	     só como chamada mais curta. -->
+	<section class="bg-creme-100 py-16" aria-label="Nossa história">
+		<div class="mx-auto max-w-md px-6 text-center">
+			<h2 class="text-carvao-900">Quem faz: linho, agulha, e vontade</h2>
+			<p class="mt-4 text-carvao-700">
+				A SOE nasceu de um jeito simples: sem produção em massa, sem pressa. Corte, bordado
+				e acabamento, um laço de cada vez.
+			</p>
+			<a
+				href="/nossa-historia"
+				class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-carvao-900 underline decoration-dourado-500 underline-offset-4 hover:text-terracota-700"
+			>
+				Ler nossa história
+			</a>
+		</div>
+	</section>
+
+	<!-- Seção 6: CTA final.
+	     Remodelagem 2026-08-10: antes era comentário vazio. Fecha a home no
+	     mesmo convite que o resto do site usa (WhatsApp, tom "friendly
+	     invitation" — nunca "Compre agora!"), com o mesmo fundo escuro do
+	     rodapé para os dois lerem como um bloco só. -->
+	<section class="bg-carvao-900 py-16 text-center text-creme-100" aria-label="Fale com a gente">
+		<div class="mx-auto max-w-md px-6">
+			<h2 class="text-creme-50">Não achou o que procurava?</h2>
+			<p class="mt-3 text-creme-300">
+				O catálogo completo, com todas as variações, vive no WhatsApp da SOE.
+			</p>
+			<a
+				href={`https://wa.me/${NUMERO_WHATSAPP_PENDENTE}?text=${mensagemWhatsAppCatalogo}`}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-dourado-500 px-6 py-3 text-sm font-semibold text-carvao-900 shadow-low transition-shadow hover:shadow-medium"
+			>
+				Ver catálogo completo no WhatsApp
+			</a>
+		</div>
+	</section>
 </BaseLayout>

@@ -5,11 +5,20 @@
 // Yan — não é retomar experimentação, é alinhar com o que o próprio
 // design-dna.json (Fase 3, extraído das fotos reais) já documentava:
 // `visual_language.focal_strategy: "single hero element"` e
-// `composition.negative_space_role: "protagonista"`. O medalhão 3D
-// (mesmo já reposicionado na Fase 9.5 para não cobrir a foto) contrariava
-// os dois — um segundo elemento visual competindo com a foto, não um
-// espaço vazio "protagonista". Ver PROGRESS.md, seção Fase 9.6, e
-// CLAUDE.md ("Arquitetura confirmada") para o histórico completo.
+// `composition.negative_space_role: "protagonista"`. Ver CLAUDE.md.
+//
+// Remodelagem 2026-08-10 (design-dna.json v2): hierarquia do texto invertida
+// — antes o <h1> era literalmente "SOE Acessórios" (o nome da marca, que já
+// aparece no Header/Logo) e a proposta de valor ficava rebaixada a parágrafo.
+// Agora o <h1> carrega a proposta de valor (o que um heading deve fazer).
+//
+// Correção 2026-08-10 (rodada real do impeccable, ver PROGRESS.md): a
+// primeira versão desta remodelagem colocava um rótulo pequeno em versalete
+// acima do <h1> ("SOE Acessórios · Feito à mão de ateliê"). O
+// `impeccable detect` (achado real, não hipotético) marcou esse padrão como
+// "kicker-above-heading" — um tell de UI gerada por IA, banido mesmo que
+// bonito. Removido aqui e nas outras 5 ocorrências do site; a informação que
+// o rótulo carregava foi incorporada no parágrafo de apoio abaixo.
 import { getCollection } from "astro:content";
 
 const produtos = await getCollection("produtos");
@@ -26,12 +35,11 @@ const imagemHero = produtoHero
 
 <section class="hero mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-24" aria-label="Produto em destaque">
 	<div class="hero-copy order-2 flex flex-col gap-4 md:order-1">
-		<p class="font-medium uppercase tracking-[0.08em] text-terracota-700">
-			Feito à mão, com carinho de ateliê
-		</p>
-		<h1 class="text-carvao-900">SOE Acessórios</h1>
-		<p class="max-w-md text-lg text-carvao-700">
+		<h1 class="text-carvao-900">
 			Acessórios de cabelo artesanais para quem faz questão do detalhe.
+		</h1>
+		<p class="max-w-sm text-lg text-carvao-700">
+			Feito à mão de ateliê: laços em linho bordados um a um, em pequenos lotes.
 		</p>
 		<a
 			href="/catalogo"

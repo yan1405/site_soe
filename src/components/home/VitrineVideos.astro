@@ -28,25 +28,40 @@ const videos = [
 ];
 ---
 
-<section class="vitrine-videos mx-auto max-w-6xl px-6 py-16" aria-label="Vitrine de vídeos SOE Acessórios">
-	<ul class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-		{
-			videos.map((video) => (
-				<li class="overflow-hidden rounded-xl bg-creme-300 shadow-low">
-					<video
-						class="vitrine-video aspect-[9/16] w-full object-cover"
-						src={video.src}
-						poster={video.poster}
-						muted
-						loop
-						playsinline
-						preload="none"
-						aria-label={video.aria}
-					/>
-				</li>
-			))
-		}
-	</ul>
+<section class="vitrine-videos bg-white py-16" aria-label="Vitrine de vídeos SOE Acessórios">
+	<div class="mx-auto max-w-6xl px-6">
+		<!-- Remodelagem 2026-08-10 (design-dna.json v2): a seção não tinha
+		     nenhum texto de contexto, só os 3 vídeos soltos. Adicionado título
+		     (sem CTA — continua ilustração visual pura, ver CLAUDE.md,
+		     "Vitrine de vídeos") e um fundo branco pra criar o bloco de cor
+		     alternado (creme→branco→creme) que substitui sombra como
+		     separador de seção. A lógica de animação em si (fade sutil,
+		     revelação por scroll) é a que o Yan disse gostar e continua
+		     idêntica, só a moldura visual ao redor mudou.
+		     Correção 2026-08-10: a primeira versão tinha um rótulo "Do nosso
+		     ateliê" acima do título — removido, achado real do
+		     `impeccable detect` (kicker-above-heading), ver Hero.astro. -->
+		<h2 class="text-carvao-900">Do nosso ateliê: o bastidor de quem faz</h2>
+
+		<ul class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+			{
+				videos.map((video) => (
+					<li class="overflow-hidden rounded-xl bg-creme-300">
+						<video
+							class="vitrine-video aspect-[9/16] w-full object-cover"
+							src={video.src}
+							poster={video.poster}
+							muted
+							loop
+							playsinline
+							preload="none"
+							aria-label={video.aria}
+						/>
+					</li>
+				))
+			}
+		</ul>
+	</div>
 </section>
 
 <script>

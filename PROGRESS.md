@@ -1156,3 +1156,100 @@ Capturados via `astro preview` (produção real, não dev server):
 - `05-pagina-carrinho-preco-com-virgula.jpg` — rota `/carrinho` standalone, mesmo item, item e total em vírgula.
 
 Fase 9.6 concluída. **Não commitei ainda** e **não iniciei a Fase 10** — aguardando você revisar os screenshots, como combinado.
+
+---
+
+## Fase 11 — Remodelagem completa de design (2026-08-10)
+
+**Não numerada no `ORQUESTRACAO_PROMPTS_SOE.md` original (Fases 0–10)** — decisão do Yan, feita depois de ver o resultado da Fase 9.6 ("ainda não gostei do design") e pedir uma reconstrução completa baseada na extração de Design DNA do site de referência (`design-dna-atelieno-referencia.json`, já existente desde mais cedo no mesmo dia), sem copiar a referência, usando os tokens e a logo da própria SOE.
+
+### Onde isso rodou
+
+Sessão Cowork (ambiente de nuvem), não a sessão local Claude Code do Yan. A ponte com o computador do Yan (`device bridge`) caiu no meio da sessão, depois que os arquivos já tinham sido lidos mas antes de conseguir escrevê-los de volta no disco — por isso esta fase chega como pacote de arquivos para o Yan aplicar manualmente, não já commitada no repositório local. Isso está registrado com transparência, não escondido.
+
+### O que foi feito
+
+1. **`design-dna` (skill, Phase 3 — Generate):** gerado `src/styles/design-dna.json` v2, mesclando o v1 (SOE, cor/mood real das fotos) com `design-dna-atelieno-referencia.json` (estrutura/tipografia/spacing medidos ao vivo em atelieno.com). Decisões documentadas campo a campo no próprio arquivo, chave `meta.decision_log`.
+2. Logo vetorizada aplicada pela primeira vez — `src/components/layout/Logo.astro`, usada no Header, Footer, favicon e imagem OG.
+3. Tipografia trocada: Work Sans (peso 300–800) cobre heading+corpo; Playfair Display virou acento raríssimo (`.acento-citacao`, 1 uso, em `/nossa-historia`).
+4. Cantos arredondados da SOE mantidos (não adotados os cantos retos da referência).
+5. Header, Footer, Hero, VitrineVideos, ProdutoCard, index.astro, catalogo.astro, produto/[slug].astro, carrinho.astro, nossa-historia.astro, institucional/* e CookieBanner remodelados.
+6. Home: as 3 seções que existiam só como comentário HTML vazio (Prova social, Teaser Nossa História, CTA final) foram implementadas de verdade.
+7. Todos os placeholders em colchetes (`[CNPJ/MEI — PENDENTE]` etc.) substituídos por valores fictícios centralizados em `src/lib/config.ts` — ver tabela em `CLAUDE.md`, "Placeholders obrigatórios".
+8. `tsconfig.json` estava faltando no material usado para montar o ambiente de build deste sandbox — sem ele, `astro check` reportava 6 erros de TS falso-positivos (implicit `any` em callbacks de `getCollection`). Com o `tsconfig.json` real do projeto (`extends: astro/tsconfigs/strict`), esses 6 erros desapareceram — não era um bug de código, era um artefato de ambiente incompleto.
+
+### Verificação real 1 — `astro check`
+
+```
+Result (29 files):
+- 0 errors
+- 0 warnings
+- 9 hints
+```//(os 9 hints são todos "'z' is deprecated" em `content.config.ts`, alerta do próprio Zod, não erro de app)
+
+### Verificação real 2 — `astro build`
+
+```
+[build] 14 page(s) built in 1.84s
+[build] Complete!
+```
+
+### Verificação real 3 — screenshots reais via Chromium/Playwright
+
+Capturados em desktop (1440×900) e mobile (390×844) para: home, catálogo, produto, carrinho, nossa-história, política de privacidade. Anexados nesta entrega em `screenshots/`.
+
+### Verificação real 4 — `impeccable detect` (CLI real, não simulado)
+
+Clonado de `github.com/pbakaus/impeccable` e rodado com `npx`-equivalente dentro do sandbox — é o mesmo motor de 59 detectores determinísticos que o comando `/impeccable audit`/`critique` usa por baixo, só invocado via CLI porque o sandbox não tem acesso ao `.claude` global do Yan onde o skill está instalado localmente.
+
+**Rodada 1 — antes das correções (`detect` contra as 5 páginas renderizadas em browser real):**
+
+```json
+[
+  { "antipattern": "all-caps-body", "severity": "warning", "file": "http://127.0.0.1:4321/", "snippet": "text-transform: uppercase on 38 chars of body text" },
+  { "antipattern": "line-length", "severity": "warning", "file": "http://127.0.0.1:4321/", "snippet": "~90 chars/line (aim for <80)" },
+  { "antipattern": "line-length", "severity": "warning", "file": "http://127.0.0.1:4321/", "snippet": "~128 chars/line (aim for <80)" },
+  { "antipattern": "kicker-above-heading", "severity": "warning", "file": "http://127.0.0.1:4321/", "snippet": "kicker \"Do nosso ateliê\" above h2 \"Bastidor de quem faz\"" },
+  { "antipattern": "kicker-above-heading", "severity": "warning", "file": "http://127.0.0.1:4321/", "snippet": "kicker \"Curadoria pequena\" above h2 \"Carros-chefe\"" },
+  { "antipattern": "kicker-above-heading", "severity": "warning", "file": "http://127.0.0.1:4321/", "snippet": "kicker \"De verdade, sem pressa\" above h2 \"Cada laço passa pela mão de alguém\"" },
+  { "antipattern": "kicker-above-heading", "severity": "warning", "file": "http://127.0.0.1:4321/", "snippet": "kicker \"Quem faz\" above h2 \"Linho, agulha, e a vontade de fazer algo bonito\"" },
+  { "antipattern": "em-dash-overuse", "severity": "warning", "advisory": true, "file": "http://127.0.0.1:4321/", "snippet": "9 em-dashes in body text" },
+  { "antipattern": "cream-palette", "severity": "warning", "file": "http://127.0.0.1:4321/", "snippet": "cream/beige page background rgb(245, 240, 228)" },
+  { "antipattern": "image-hover-transform", "severity": "advisory", "file": "http://127.0.0.1:4321/", "snippet": "Tailwind hover transform on <img>" },
+  "... (mais achados repetidos de image-hover-transform, kicker-above-heading e cream-palette em /catalogo, /produto, /nossa-historia, /carrinho — 26 achados no total nesta rodada)"
+]
+```
+
+**Ação tomada nos achados não-advisory:** os 6 `kicker-above-heading` (rótulo pequeno em versalete acima de heading — o próprio `impeccable` descreve como "banido, mesmo bonito, mesmo repetido ou não, é um tell de UI gerada por IA") foram removidos das 6 seções onde eu os tinha introduzido (Hero, VitrineVideos, Carros-chefe, Prova social, Teaser, Nossa História, Carrinho, Catálogo). O texto que os rótulos carregavam foi incorporado nos títulos/parágrafos. Isso também eliminou os 2 achados de `all-caps-body` (eram os próprios rótulos em maiúsculas) e reduziu `em-dash-overuse` a zero na Home (o parágrafo do Hero foi reescrito, cortando um travessão).
+
+**Rodada 2 — depois das correções, mesmo comando:**
+
+```
+total findings: 20
+('cream-palette', 5)
+('image-hover-transform', 10)
+('line-length', 5)
+```
+
+`kicker-above-heading`: 6 → 0. `all-caps-body`: 2 → 0. `em-dash-overuse` (Home): 1 → 0. `line-length`: 9 → 5 (reduzido, não zerado — ver "Achado não totalmente resolvido" abaixo).
+
+**Verificação estática adicional (`impeccable detect` contra `dist/`, HTML+CSS já compilados):**
+
+```
+total: 14
+border-accent-on-rounded 1
+image-hover-transform 10
+em-dash-overuse 3
+```
+
+### Achados mantidos por decisão, não por omissão
+
+- **`cream-palette` (5 ocorrências, todas as páginas):** o próprio `impeccable` descreve fundo creme/bege como "o default 'tasteful' de IA, usado por reflexo" e recomenda "uma paleta deliberada, não o off-white seguro". A cor de fundo da SOE (`rgb(245, 240, 228)`) **é** uma paleta deliberada — é o valor medido (não estimado) do linho nas 7 fotos de produto reais, documentado desde a Fase 3. O achado é real e vale registrar, mas trocar essa cor por reflexo ao ouvir "cream-palette = ruim" contrariaria a própria evidência fotográfica que fundamenta a marca. Fica como decisão consciente, não como pendência.
+- **`image-hover-transform` (10 ocorrências, advisory):** o `scale(1.03)` no hover do card de produto é uma decisão de marca documentada desde o `design-dna.json` v1 (`visual_effects.image_effects.hover_transform`), preexistente à Fase 11. Advisory — não conta como falha, mantido.
+- **`border-accent-on-rounded` (1 ocorrência, no CSS estático compilado):** não consegui isolar com confiança qual seletor específico disparou esse achado dentro do CSS minificado do build (`BaseLayout.Bg_6Mi5o.css`) — é plausivelmente um falso positivo da checagem por proximidade textual num bundle minificado, mas não descartei por suposição. Fica registrado como aberto, não resolvido nem escondido.
+- **`em-dash-overuse` em `/institucional/privacidade`, `/institucional/termos`, `/nossa-historia` (3 ocorrências, advisory, achado estático):** esse padrão já existia no conteúdo original, antes da Fase 11 — não é texto novo desta remodelagem (só troquei os placeholders de CNPJ/e-mail/prazo nessas páginas, mantive o resto do texto jurídico/narrativo como estava). Não reescrevi essa prosa porque não fui pedido para revisar o conteúdo jurídico ou a narrativa de Nossa História, só o design.
+- **`line-length` (5 ocorrências, uma por página, ~128 chars/linha calculado):** reduzido de 9 para 5 aplicando `max-width` mais estreito a parágrafos e reduzindo `.medida-leitura` de 70ch para 58ch. As 5 restantes aparecem em todas as páginas de forma consistente com o mesmo valor (~128), sugerindo uma fonte compartilhada (Header ou Footer) que não consegui isolar com certeza dentro do tempo desta sessão — a fórmula do detector é `largura_do_elemento / (tamanho_da_fonte × 0.5)`, uma aproximação grosseira, não uma medição de coluna de texto real. Fica como item de polimento para uma próxima passada, não bloqueante.
+
+### Pendência real e nova, criada pela queda da ponte com o dispositivo
+
+A escrita de volta no disco do Yan (`C:\Users\yansi\OneDrive\Documentos\Site_cliente_SOE`) não pôde ser confirmada nesta sessão — a conexão com o computador caiu no meio do trabalho. Os arquivos foram entregues como pacote para download; **é preciso copiá-los manualmente por cima da pasta do projeto antes do próximo `npm install`/`astro build` na sessão local**, e depois `git add`/`git commit` (nada disso foi commitado — só está no pacote entregue).

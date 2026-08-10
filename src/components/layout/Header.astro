@@ -1,5 +1,6 @@
 ---
 import CartIcon from "./CartIcon.astro";
+import Logo from "./Logo.astro";
 
 const links = [
 	{ href: "/", label: "Home" },
@@ -12,9 +13,10 @@ const caminhoAtual = Astro.url.pathname;
 ---
 
 <header class="sticky top-0 z-40 border-b border-creme-300 bg-creme-100/95 backdrop-blur-sm">
-	<div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
-		<a href="/" class="font-heading text-xl font-semibold tracking-tight text-carvao-900">
-			SOE Acessórios
+	<div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3">
+		<a href="/" class="flex items-center gap-2.5 text-carvao-900" aria-label="SOE Acessórios — página inicial">
+			<Logo class="h-8 w-8 shrink-0 text-dourado-500" />
+			<span class="font-heading text-lg font-extrabold tracking-tight">SOE Acessórios</span>
 		</a>
 
 		<nav aria-label="Navegação principal" class="flex-1">

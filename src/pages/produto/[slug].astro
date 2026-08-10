@@ -52,15 +52,15 @@ const mensagemWhatsApp = encodeURIComponent(
 
 		<div class="flex flex-col gap-4">
 			<h1 class="text-carvao-900">{produto.data.nome}</h1>
-			<p class="font-heading text-2xl font-semibold text-carvao-900">
+			<p class="font-heading text-2xl font-bold text-terracota-700">
 				{formatarPreco(produto.data.preco)}
 			</p>
-			<p class="text-carvao-700">{produto.data.descricaoCurta}</p>
+			<p class="max-w-sm text-carvao-700">{produto.data.descricaoCurta}</p>
 			<p class="text-sm font-medium text-oliva-700">
 				{produto.data.disponivel ? "Disponível" : "Indisponível no momento"}
 			</p>
 
-			<div class="prose-conteudo text-carvao-700">
+			<div class="prose-conteudo max-w-sm text-carvao-700">
 				<Content />
 			</div>
 

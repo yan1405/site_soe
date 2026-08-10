@@ -429,15 +429,29 @@ Instale o Strix (curl -sSL https://strix.ai/install | bash, confirme o comando a
 
 ---
 
+## Fase 11 — Remodelagem completa de design (2026-08-10, fora da numeração 0–10 original)
+
+**Não fazia parte do plano original.** Decisão do Yan, depois de ver o resultado da Fase 9.6 ("ainda não gostei do design") e pedir reconstrução completa baseada no Design DNA extraído de referência real (`design-dna-atelieno-referencia.json`, já existente desde mais cedo no mesmo dia) — sem copiar a referência, usando os tokens e a logo da própria SOE.
+
+**Executada inteiramente numa sessão Cowork (nuvem), não nesta sessão local.** Build/validação rodaram num `npm install` limpo dentro do sandbox (Node 22 nativo) — não usaram o `node_modules` deste Windows. `impeccable` foi rodado via `npx`-equivalente do CLI real (clonado de `github.com/pbakaus/impeccable`), não via comando `/impeccable` local, porque o sandbox não tem acesso a este `.claude`.
+
+Escopo: `design-dna.json` v2 (mescla com a referência, ver `decision_log` no próprio arquivo), logo aplicada pela primeira vez (Header/Footer/favicon/OG), tipografia trocada de Playfair Display (heading) para Work Sans em dois pesos, cantos arredondados mantidos, 3 seções vazias da Home preenchidas (prova social, teaser, CTA final), carrossel de carros-chefe, todos os placeholders em colchetes trocados por valores fictícios (`src/lib/config.ts`). Depois de duas rodadas reais de `impeccable detect`, 6 achados de "kicker-above-heading" (rótulo em versalete acima de heading — tell de UI gerada por IA) e 2 de "all-caps-body" foram corrigidos; "cream-palette" e "image-hover-transform" foram mantidos por decisão documentada (cor medida de foto real, não default genérico; hover já era decisão de marca anterior).
+
+**Detalhe completo, com a saída literal do `impeccable` antes/depois:** ver `PROGRESS.md`, seção "Fase 11 — Remodelagem completa de design".
+
+**Consequência prática:** o `design-dna.json`, o `tailwind.config.mjs`, o `global.css` e praticamente todos os componentes/páginas de UI mudaram de conteúdo nesta fase — qualquer prompt das Fases 0–10 acima que descreva a aparência visual anterior (ex. Playfair Display como heading padrão) está desatualizado; a arquitetura/rotas/stack continuam as mesmas.
+
+---
+
 ## Pendências que continuam fora do código
 
 1. Lista final de produtos carro-chefe — as 5 entradas da Fase 2 são provisórias.
 2. Confirmação de `w.app/rkoc19` como WhatsApp de produção — placeholder na Fase 4.
-3. Status de registro da cliente (CNPJ/MEI/informal) — placeholder na Fase 7. Revisão jurídica do texto legal recomendada antes de publicar.
+3. Status de registro da cliente (CNPJ/MEI/informal) — Fase 7 usava placeholder em colchetes; Fase 11 trocou por um CNPJ FICTÍCIO (`48.163.905/0001-27`, não validado, não real) só pra tirar o placeholder visível, ver `src/lib/config.ts`. Ainda precisa do dado real da cliente e de revisão jurídica do texto legal antes de publicar.
 4. Gateway de pagamento — não bloqueia nenhuma fase; dispara o segundo momento de execução do Strix quando decidido.
 5. Revisão do laço verde-oliva bordado (maior desvio de cor, ganho 1,35×) — independente do código.
-6. E-mail de contato oficial da cliente — usado nos textos legais da Fase 7 como [E-MAIL_PENDENTE], ainda não coletado.
-7. Endereço da cliente para o rodapé/Termos — [ENDEREÇO — PENDENTE].
+6. E-mail de contato oficial da cliente — Fase 7 usava `[E-MAIL_PENDENTE]`; Fase 11 trocou por `contato@soeacessorios.com.br` (FICTÍCIO, inventado pra preview, não é um e-mail real da cliente), ver `src/lib/config.ts`. Ainda precisa do e-mail real.
+7. Endereço da cliente para o rodapé/Termos — Fase 7 usava `[ENDEREÇO — PENDENTE]`; Fase 11 trocou por um endereço FICTÍCIO em Florianópolis/SC (única inferência com alguma base real — é a cidade do handle @soefloripa), ver `src/lib/config.ts`. Ainda precisa do endereço real.
 
 ## Fontes consultadas (2026-08-07/08)
 

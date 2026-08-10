@@ -10,20 +10,39 @@ interface Props {
 	imagemSrc?: string;
 	imagemWidth?: number;
 	imagemHeight?: number;
+	class?: string;
 }
 
-const { slug, nome, descricaoCurta, preco, disponivel, imagemSrc, imagemWidth, imagemHeight } =
-	Astro.props;
+const {
+	slug,
+	nome,
+	descricaoCurta,
+	preco,
+	disponivel,
+	imagemSrc,
+	imagemWidth,
+	imagemHeight,
+	class: classeExtra,
+} = Astro.props;
+
+// Remodelagem 2026-08-10 (design-dna.json v2, componentes): a referência
+// (design-dna-atelieno-referencia.json) mostrou "card sem chrome" — produto
+// flutua sobre o fundo, sem borda/sombra/fundo de card ao redor, nome+preço
+// alinhados à esquerda abaixo da imagem. Adotado o FORMATO (sombra só no
+// hover, sem fundo de card constante), mantendo os cantos arredondados
+// (token SOE) e o botão de compra visível — a referência omite botão
+// visível no card, mas o CLAUDE.md exige CTA de compra (achado P0 da
+// Fase 9), então esse ponto não foi copiado.
 ---
 
 <li
-	class="produto-card group flex flex-col overflow-hidden rounded-xl bg-creme-50 shadow-low transition-shadow hover:shadow-medium"
+	class:list={["produto-card group flex flex-col", classeExtra]}
 	data-slug={slug}
 	data-nome={nome}
 	data-preco={preco}
 >
 	<a href={`/produto/${slug}`} class="flex flex-1 flex-col">
-		<div class="aspect-square overflow-hidden bg-creme-300">
+		<div class="aspect-square overflow-hidden rounded-xl bg-creme-300 transition-shadow group-hover:shadow-medium">
 			{
 				imagemSrc && (
 					<img
@@ -37,16 +56,16 @@ const { slug, nome, descricaoCurta, preco, disponivel, imagemSrc, imagemWidth, i
 				)
 			}
 		</div>
-		<div class="flex flex-1 flex-col gap-1 p-4">
-			<p class="font-heading text-lg font-semibold text-carvao-900">{nome}</p>
+		<div class="flex flex-1 flex-col gap-1 pt-3">
+			<p class="font-heading text-base font-bold text-carvao-900">{nome}</p>
 			<p class="line-clamp-2 text-sm text-carvao-700">{descricaoCurta}</p>
-			<p class="mt-2 font-heading text-base font-semibold text-carvao-900">
+			<p class="mt-1 font-heading text-base font-bold text-terracota-700">
 				{formatarPreco(preco)}
 			</p>
 		</div>
 	</a>
 
-	<div class="p-4 pt-0">
+	<div class="pt-3">
 		<button
 			type="button"
 			class="adicionar-carrinho w-full rounded-full bg-dourado-500 px-4 py-2.5 text-sm font-semibold text-carvao-900 shadow-low transition-shadow hover:shadow-medium disabled:cursor-not-allowed disabled:bg-creme-300 disabled:text-carvao-500 disabled:shadow-none"

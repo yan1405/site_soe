@@ -11,8 +11,18 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout title="Nossa História">
+	<!-- Correção 2026-08-10: rótulo acima do h1 removido — achado real do
+	     `impeccable detect` (kicker-above-heading), ver Hero.astro. -->
 	<div class="mx-auto max-w-3xl px-6 py-16">
-		<h1 class="text-carvao-900">Nossa História</h1>
+		<h1 class="text-carvao-900">Nossa História: quem faz</h1>
+
+		<!-- Remodelagem 2026-08-10 (design-dna.json v2, decision_log): único
+		     uso de "acento-citacao" (Playfair Display itálico) da página —
+		     por decisão explícita, no máximo 1 por página, pra manter um
+		     traço "feito à mão" sem reintroduzir serifada como padrão. -->
+		<p class="acento-citacao mt-6 max-w-xl text-2xl text-terracota-700">
+			"Linho, agulha, e a vontade de fazer alguma coisa bonita com as próprias mãos."
+		</p>
 
 		<div class="medida-leitura mt-6 flex flex-col gap-5 text-carvao-700">
 			<p>

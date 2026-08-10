@@ -1,16 +1,18 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
+import { NUMERO_WHATSAPP_PENDENTE, EMAIL_FICTICIO } from "../../lib/config";
 
 // Sem backend/formulário neste projeto (ver CLAUDE.md — carrinho e contato
 // são 100% client-side) — o canal de contato real é o WhatsApp, com e-mail
 // como alternativa. Achado do critique (Fase 9): esta página precisa de
-// pelo menos um CTA, não pode ficar vazia.
+// pelo menos um CTA, não pode ficar vazia. Remodelagem 2026-08-10: e-mail
+// fictício de src/lib/config.ts substitui o placeholder em colchetes.
 ---
 
 <BaseLayout title="Contato">
 	<div class="mx-auto max-w-2xl px-6 py-16">
-		<h1 class="text-carvao-900">Contato</h1>
+		<p class="rotulo-secao text-terracota-700">Fale com a gente</p>
+		<h1 class="mt-2 text-carvao-900">Contato</h1>
 		<p class="mt-4 text-carvao-700">
 			Prefere falar direto com a gente? É rapidinho — respondemos por WhatsApp ou e-mail.
 		</p>
@@ -25,11 +27,12 @@ import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
 				Chamar no WhatsApp
 			</a>
 
-			<span
-				class="inline-flex items-center justify-center gap-2 rounded-full border border-dashed border-carvao-300 px-6 py-3 text-sm font-medium text-carvao-700"
+			<a
+				href={`mailto:${EMAIL_FICTICIO}`}
+				class="inline-flex items-center justify-center gap-2 rounded-full border border-carvao-300 px-6 py-3 text-sm font-medium text-carvao-900 transition-colors hover:border-carvao-900"
 			>
-				[E-MAIL_PENDENTE]
-			</span>
+				{EMAIL_FICTICIO}
+			</a>
 		</div>
 	</div>
 </BaseLayout>

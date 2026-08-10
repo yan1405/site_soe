@@ -1,40 +1,73 @@
 ---
-import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
+import {
+	NUMERO_WHATSAPP_PENDENTE,
+	CNPJ_FICTICIO,
+	ENDERECO_FICTICIO,
+	EMAIL_FICTICIO,
+} from "../../lib/config";
+import Logo from "./Logo.astro";
 
-// Tratamento visual dos placeholders pendentes: continuam literais (nenhum
-// valor real inventado), só ganham um selo que os diferencia de "site
-// quebrado" — ver achado do /impeccable critique (Fase 9).
+// Remodelagem 2026-08-10: os placeholders em colchetes ([CNPJ/MEI —
+// PENDENTE] etc.) foram substituídos pelos valores fictícios de
+// src/lib/config.ts, sem selo visual de "pendente" (pedido explícito do
+// Yan — nenhum placeholder deve aparecer). O rastreamento de que são
+// valores fictícios, não reais, fica em src/lib/config.ts e no CLAUDE.md,
+// não na interface.
 ---
 
-<footer class="bg-carvao-900 px-6 py-10 text-creme-100">
-	<div class="mx-auto flex max-w-6xl flex-col gap-6 text-sm">
-		<p>
-			SOE Acessórios —
-			<span class="rounded-full border border-dashed border-creme-500/60 px-2 py-0.5 text-creme-300">
-				[CNPJ/MEI — PENDENTE]
+<footer class="bg-carvao-900 px-6 py-12 text-creme-100">
+	<div class="mx-auto flex max-w-6xl flex-col gap-8">
+		<div class="flex items-center gap-2.5">
+			<Logo class="h-7 w-7 shrink-0 text-dourado-500" />
+			<span class="font-heading text-base font-extrabold tracking-tight text-creme-50">
+				SOE Acessórios
 			</span>
-			—
-			<span class="rounded-full border border-dashed border-creme-500/60 px-2 py-0.5 text-creme-300">
-				[ENDEREÇO — PENDENTE]
-			</span>
-		</p>
-		<p>
-			Contato:
-			<span class="rounded-full border border-dashed border-creme-500/60 px-2 py-0.5 text-creme-300">
-				[E-MAIL_PENDENTE]
-			</span>
-			· WhatsApp:
-			<span class="rounded-full border border-dashed border-creme-500/60 px-2 py-0.5 text-creme-300">
-				{NUMERO_WHATSAPP_PENDENTE}
-			</span>
-		</p>
+		</div>
 
-		<nav aria-label="Links institucionais">
-			<ul class="flex flex-wrap gap-x-6 gap-y-2">
-				<li><a class="hover:text-dourado-500" href="/institucional/privacidade">Política de Privacidade</a></li>
-				<li><a class="hover:text-dourado-500" href="/institucional/termos">Termos de Uso</a></li>
-				<li><a class="hover:text-dourado-500" href="/institucional/trocas-devolucoes">Trocas e Devoluções</a></li>
-			</ul>
-		</nav>
+		<div class="grid gap-8 text-sm text-creme-300 sm:grid-cols-3">
+			<div class="flex flex-col gap-2">
+				<p class="rotulo-secao text-creme-500">Ateliê</p>
+				<p>{CNPJ_FICTICIO}</p>
+				<p>{ENDERECO_FICTICIO}</p>
+			</div>
+
+			<div class="flex flex-col gap-2">
+				<p class="rotulo-secao text-creme-500">Contato</p>
+				<p>
+					<a class="hover:text-dourado-500" href={`mailto:${EMAIL_FICTICIO}`}>{EMAIL_FICTICIO}</a>
+				</p>
+				<p>
+					<a
+						class="hover:text-dourado-500"
+						href={`https://wa.me/${NUMERO_WHATSAPP_PENDENTE}`}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						WhatsApp
+					</a>
+				</p>
+				<p>
+					<a class="hover:text-dourado-500" href="https://www.instagram.com/soefloripa" target="_blank" rel="noopener noreferrer">
+						@soefloripa
+					</a>
+				</p>
+			</div>
+
+			<div class="flex flex-col gap-2">
+				<p class="rotulo-secao text-creme-500">Institucional</p>
+				<nav aria-label="Links institucionais">
+					<ul class="flex flex-col gap-2">
+						<li><a class="hover:text-dourado-500" href="/institucional/privacidade">Política de Privacidade</a></li>
+						<li><a class="hover:text-dourado-500" href="/institucional/termos">Termos de Uso</a></li>
+						<li><a class="hover:text-dourado-500" href="/institucional/trocas-devolucoes">Trocas e Devoluções</a></li>
+						<li><a class="hover:text-dourado-500" href="/institucional/contato">Contato</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+
+		<p class="border-t border-creme-900/60 pt-6 text-xs text-creme-500">
+			© {new Date().getFullYear()} SOE Acessórios — feito à mão, um de cada vez.
+		</p>
 	</div>
 </footer>

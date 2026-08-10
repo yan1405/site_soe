@@ -1,8 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { CNPJ_FICTICIO, ENDERECO_FICTICIO, CIDADE_UF_FICTICIA } from "../../lib/config";
 
 // Rascunho estruturado — NÃO é aconselhamento jurídico, precisa de revisão
-// por advogado antes de produção. Ver CLAUDE.md, "Aviso sobre o conteúdo jurídico".
+// por advogado antes de produção. Ver CLAUDE.md, "Aviso sobre o conteúdo
+// jurídico". Remodelagem 2026-08-10: CNPJ/endereço/foro fictícios de
+// src/lib/config.ts substituem os placeholders em colchetes.
 ---
 
 <BaseLayout title="Termos de Uso">
@@ -17,8 +20,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
 	<h2>2. Sobre a SOE Acessórios</h2>
 	<p>
-		Este site é operado por SOE Acessórios, [CNPJ/MEI — PENDENTE], com sede em
-		[ENDEREÇO — PENDENTE].
+		Este site é operado por SOE Acessórios, {CNPJ_FICTICIO}, com sede em
+		{ENDERECO_FICTICIO}.
 	</p>
 
 	<h2>3. Propriedade intelectual</h2>
@@ -65,7 +68,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
 	<h2>9. Foro</h2>
 	<p>
-		Fica eleito o foro da comarca de [CIDADE/UF — PENDENTE] para dirimir eventuais
+		Fica eleito o foro da comarca de {CIDADE_UF_FICTICIA} para dirimir eventuais
 		controvérsias decorrentes destes Termos, com renúncia a qualquer outro, por mais
 		privilegiado que seja.
 	</p>

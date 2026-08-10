@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "name": "Ateliê Nó — Design DNA (referência externa)",
+    "description": "Extração feita ao vivo em 10/08/2026, navegando https://www.atelieno.com/ via browser automation (Claude in Chrome) e lendo valores computados de CSS reais (getComputedStyle) diretamente do DOM — não é análise só de screenshot. Todo campo abaixo é marcado explicitamente como MEDIDO (valor exato de rgb()/px lido via computed style) ou ESTIMADO (leitura visual do screenshot, sem pixel-sampling exato) dentro do próprio valor/nota, para não misturar precisão real com aproximação — rigor pedido pelo Yan. Objetivo: preencher com evidência de UI real os campos que no design-dna.json original da SOE (src/styles/design-dna.json) estavam marcados como 'INFERIDO' por terem sido extraídos só de fotos still-life de produto, sem nenhum site de referência.",
+    "source_references": [
+      "https://www.atelieno.com/ (home — hero mosaico, carrossel 'Mais Vendidos', seção editorial 'Nossa Brisa do Mar na Cidade', footer)",
+      "https://www.atelieno.com/product-page/corrente-globo (página de produto 'Colar Aquario' — botões, stepper, acordeão)"
+    ],
+    "created_at": "2026-08-10"
+  },
+  "design_system": {
+    "color": {
+      "palette_type": "complementary",
+      "primary": {
+        "hex": "#BC4C2A",
+        "role": "terracota/laranja queimado — MEDIDO via computed style: background-color do botão 'Adicionar ao Carrinho' (rgb(188,76,42)) e color do item de navegação ativo 'Página Inicial' (mesmo valor exato). É a única cor saturada usada para estado ativo, preço e CTA primário."
+      },
+      "secondary": {
+        "hex": "#111111",
+        "role": "preto suave, não #000 puro — MEDIDO via computed style: background-color do botão secundário 'Comprar' e color do texto de corpo/nav inativo (rgb(17,17,17) em ambos os casos)."
+      },
+      "accent": {
+        "hex": "#1B3A5C",
+        "role": "azul marinho — ESTIMADO por leitura visual da imagem de água do mar na seção hero e das contas de vidro azul nas fotos de produto; não foi possível medir via computed style porque a cor vem de raster (imagem), não de um valor CSS. Usado só dentro de fotografia, nunca como cor de UI (botão, texto, fundo)."
+      },
+      "neutral": {
+        "scale": ["#FFFFFF", "#FAFAFA", "#E4DBCB", "#C7BCA6", "#8A8071", "#555550", "#111111"],
+        "usage": "#FFFFFF (MEDIDO, background-color das seções de produto/footer) e #FAFAFA (MEDIDO, rgba(250,250,250,0.8) na faixa 'Siga nosso Instagram') são os dois brancos/quase-brancos reais. #E4DBCB e #C7BCA6 são ESTIMADOS visualmente do bege-areia do hero e do cenário das fotos de produto (superfície tipo linho/areia sob o colar). #8A8071/#555550 são ESTIMADOS para texto secundário (SKU, descrição). #111111 é o texto/preto MEDIDO."
+      },
+      "semantic": {
+        "success": "#111111",
+        "warning": "#BC4C2A",
+        "error": "#BC4C2A",
+        "info": "#1B3A5C"
+      },
+      "surface": {
+        "background": "#FFFFFF",
+        "card": "sem cor de cartão própria — MEDIDO/observado: o produto flutua direto sobre #FFFFFF, sem borda nem fundo de card ao redor; a 'ambientação' vem da cenografia dentro da própria fotografia (superfície clara), não de um elemento de UI.",
+        "elevated": "não observado nesta sessão (carrinho lateral/modal não foi aberto)"
+      },
+      "contrast_strategy": "dark-on-light dominante, com um único acento saturado (terracota #BC4C2A) reservado para estado ativo/preço/CTA primário, e preto #111111 reservado para o CTA secundário e texto de corpo — MEDIDO nos dois botões da página de produto. Nenhuma cor saturada é usada como fundo de área grande."
+    },
+    "typography": {
+      "type_scale": {
+        "display": { "size": "3rem (ESTIMADO, ~48px)", "weight": "700 (ESTIMADO)", "line_height": "1.05 (ESTIMADO)", "tracking": "normal — o efeito de caixa alta vem de texto literal em maiúsculas, não de text-transform (confirmado via computed style: textTransform: none)" },
+        "heading_1": { "size": "1.75rem (ESTIMADO, ~28px — título de produto na PDP, não isolado com precisão via seletor)", "weight": "400 (mesma família leve do corpo, não um peso distinto)", "line_height": "1.2 (ESTIMADO)", "tracking": "normal" },
+        "heading_2": { "size": "14px (MEDIDO)", "weight": "400 (MEDIDO)", "line_height": "17px (MEDIDO)", "tracking": "normal — funciona como rótulo/eyebrow ('Mais Vendidos'), maiúsculas são texto literal" },
+        "heading_3": { "size": "16px (MEDIDO)", "weight": "400 (MEDIDO — apesar do nome do arquivo de fonte ser 'poppins-semibold', o computed fontWeight retorna 400; o peso semibold está embutido no arquivo da fonte, não expresso via font-weight CSS)", "line_height": "normal (MEDIDO)", "tracking": "normal" },
+        "body": { "size": "16px (MEDIDO)", "weight": "400 (MEDIDO)", "line_height": "20px (MEDIDO)", "tracking": "normal" },
+        "body_small": { "size": "14px (ESTIMADO)", "weight": "400", "line_height": "1.4 (ESTIMADO)", "tracking": "normal" },
+        "caption": { "size": "12px (ESTIMADO — linha de CNPJ/rodapé)", "weight": "400", "line_height": "1.3 (ESTIMADO)", "tracking": "normal" },
+        "overline": { "size": "14px (MEDIDO, mesmo valor do heading_2 — mesma função de rótulo)", "weight": "400 (MEDIDO)", "line_height": "17px (MEDIDO)", "tracking": "normal" }
+      },
+      "font_families": {
+        "heading": "Poppins (peso Semibold/Bold conforme o arquivo de fonte) — geométrica sem serifa. MEDIDO via computed style em pelo menos um heading real (h3: font-family 'poppins-semibold, poppins, sans-serif'). O headline editorial grande ('Nossa Brisa do Mar na Cidade') não foi isolado por seletor nesta sessão, mas segue visualmente a mesma família, com peso mais pesado.",
+        "body": "Avenir Light ('avenir-lt-w01_35-light') — humanista sem serifa, peso leve. MEDIDO via computed style em corpo de texto, navegação, nome de produto, preço e nos dois botões de CTA — é a fonte dominante do site, usada em praticamente tudo exceto os headlines editoriais grandes.",
+        "mono": "não observado/não aplicável — nenhum uso de fonte monoespaçada identificado no site nesta sessão."
+      },
+      "font_style_notes": "Dado real relevante para a reconstrução da SOE: o contraste tipográfico aqui é só de peso/tamanho (Avenir Light leve vs. Poppins Semibold/Bold pesado), não de categoria de fonte — as duas famílias medidas são sans-serif. Isso contradiz diretamente a suposição 'script/serifada elegante' que o design-dna.json original da SOE tinha marcado como INFERIDO (sem evidência real, só inferência do tom de voz do Instagram). O site de referência real não usa nenhuma serifa em lugar nenhum."
+    },
+    "spacing": {
+      "base_unit": "8px (ESTIMADO — coincide com o padding vertical medido do botão 'Adicionar ao Carrinho', 8px 15px)",
+      "scale": [8, 16, 24, 32, 48, 64, 96, 128],
+      "content_density": "spacious",
+      "section_rhythm": "ESTIMADO visualmente: faixas alternadas de fundo (branco / bege-areia / cinza claro) marcam a transição entre seções, com bastante respiro vertical entre título editorial grande e o corpo de texto que o acompanha. Não medido em pixels exatos nesta sessão."
+    },
+    "layout": {
+      "grid_system": "ESTIMADO: mosaico assimétrico de imagens de tamanhos desiguais no hero (colagem, não grid regular); grid regular de colunas iguais no carrossel de produtos (5 itens visíveis no viewport testado, 1568px)",
+      "max_content_width": "ESTIMADO, ~1440px — o layout parece full-bleed com padding lateral fixo, não confinado a um container estreito centralizado",
+      "columns": "5 no carrossel de produtos (medido por contagem visual); mosaico irregular no hero (não é um grid de colunas)",
+      "gutter": "ESTIMADO, ~24px entre cards do carrossel",
+      "breakpoints": { "sm": "640px", "md": "768px", "lg": "1024px", "xl": "1280px", "nota": "valores padrão de referência — responsividade não foi testada nesta sessão (viewport único de 1568×675 / depois 1280×551)" },
+      "alignment_tendency": "mixed — o hero é assimétrico/colagem (mosaico), mas navegação, carrossel de produto e rodapé seguem grid regular alinhado à esquerda"
+    },
+    "shape": {
+      "border_radius": {
+        "small": "0px (MEDIDO)",
+        "medium": "0px (MEDIDO)",
+        "large": "0px (MEDIDO)",
+        "pill": "0px no DOM (MEDIDO) — o botão 'Siga nosso Instagram' parece uma pílula arredondada no screenshot, mas o border-radius computado do elemento é 0px; o arredondamento visual, se existir, vem de uma camada SVG separada do renderizador do Wix, não de CSS border-radius. Registrado como discrepância real entre percepção visual e valor de DOM, não escondida."
+      },
+      "border_usage": "subtle 1px — usado em input (stepper de quantidade), thumbnails de imagem da galeria e no botão outline de favoritar (mesma cor terracota da borda); os dois botões de CTA sólidos (Adicionar ao Carrinho, Comprar) não têm borda, só preenchimento — MEDIDO (border: '0px solid...' nos dois)",
+      "divider_style": "linha fina cinza clara separando os itens de acordeão (Ficha Técnica / Cuidados Especiais / Trocas, Devoluções e Garantia) na página de produto"
+    },
+    "elevation": {
+      "shadow_style": "none",
+      "levels": {
+        "low": "none (MEDIDO — nenhum elemento inspecionado tinha box-shadow diferente de none)",
+        "medium": "none (MEDIDO)",
+        "high": "none (MEDIDO)"
+      },
+      "depth_cues": "ausência de sombra em todos os elementos inspecionados — a separação visual entre seções vem inteiramente de blocos de cor sólida (branco/bege/cinza claro) alternados, não de elevação/sombra"
+    },
+    "iconography": {
+      "style": "line",
+      "stroke_weight": "~1.5px (ESTIMADO visualmente)",
+      "size_scale": [16, 20, 24, 32],
+      "preferred_set": "custom/linha fina — ícones de busca, carrinho, login, chat, Instagram e Pinterest têm o mesmo tratamento de traço fino consistente; não foi possível identificar biblioteca de terceiros (não corresponde a Feather/Material/Lucide padrão), provavelmente ícones nativos do editor Wix."
+    },
+    "motion": {
+      "easing": "não medido nesta sessão — não foi capturada a curva de easing exata de nenhuma transição",
+      "duration_scale": { "micro": "150ms (ESTIMADO)", "normal": "300ms (ESTIMADO)", "macro": "600ms (ESTIMADO)" },
+      "entrance_pattern": "blur-up em imagens ao carregar (placeholder borrado que nitidifica progressivamente) — observado diretamente nos primeiros screenshots desta sessão, é o único comportamento de motion confirmado",
+      "exit_pattern": "não observado nesta sessão",
+      "philosophy": "funcional mínimo — nenhuma indicação de motion elaborado (parallax, bounce, scroll-scrub) nas páginas visitadas; a navegação por scroll direto via JavaScript usada nesta sessão pode ter mascarado animações de reveal-on-scroll que existiriam num scroll manual normal, então esse ponto fica como lacuna, não como 'confirmadamente ausente'"
+    },
+    "components": {
+      "button_style": "retangular, sem cantos arredondados (border-radius 0, MEDIDO), preenchimento sólido. Primário em terracota #BC4C2A com texto branco ('Adicionar ao Carrinho'); secundário em preto #111111 com texto branco ('Comprar'), empilhado logo abaixo do primário, mesma largura. Ambos com peso de fonte normal (400, não bold, MEDIDO) e padding compacto (8–10px vertical, 15–16px horizontal, MEDIDO). Botão terciário outline (favoritar/coração) usa a cor terracota só na borda, fundo transparente.",
+      "input_style": "stepper de quantidade com borda fina 1px, cantos retos (0px), botões +/- em texto simples sem preenchimento de fundo",
+      "card_style": "sem chrome de cartão — sem borda, sem sombra, sem fundo próprio ao redor da imagem do produto; o produto flutua sobre o branco da página, e a 'ambientação' vem da cenografia dentro da própria fotografia (superfície clara tipo areia/tecido). Nome do produto e preço alinhados à esquerda abaixo da imagem; preço em itálico, na cor terracota (diferente do nome do produto, que é reto/normal e preto).",
+      "navigation_pattern": "header com logo centralizado, ícones de login/busca/carrinho nas extremidades; barra de navegação horizontal abaixo do header, item ativo destacado em terracota #BC4C2A (MEDIDO) contra os demais itens em preto #111111 (MEDIDO)",
+      "modal_style": "não observado nesta sessão — o carrinho lateral (drawer) não foi aberto",
+      "list_style": "carrossel horizontal de produtos com setas de navegação finas nas laterais (chevron simples), 5 itens visíveis no viewport testado (1568px de largura)",
+      "component_notes": "Diferença real e relevante frente ao design-dna.json original da SOE: aqui todo componente inspecionado (botões, input, thumbnails) tem cantos retos (0px de border-radius, MEDIDO), enquanto o sistema atual da SOE assume cantos arredondados (small 6px/medium 12px/large 24px, todos ESTIMADOS/INFERIDOS, sem evidência real). Isso é um ponto de decisão explícita para a reconstrução: manter os cantos arredondados da SOE (mais coerente com o tom 'orgânico, sem arestas retas' dos laços de linho) ou adotar os cantos retos desta referência (mais 'editorial/gráfico') — não é uma inconsistência a resolver escondendo um dos dois valores, é uma escolha de marca a decidir com o Yan."
+    }
+  },
+  "design_style": {
+    "aesthetic": {
+      "mood": ["sofisticado", "editorial", "urbano", "despojado", "confiante"],
+      "visual_metaphor": "editorial de moda contemporânea — colagem de still-life de acessório, fotografia de moda em preto e branco de alto contraste, e paisagem (mar) numa única composição de hero",
+      "era_influence": "contemporâneo, com referência sazonal explícita na copy ('Nossa brisa do mar na cidade' — verão urbano/náutico)",
+      "genre": "e-commerce de joalheria autoral, tom editorial de moda — mais próximo de revista de moda do que de vitrine artesanal caseira",
+      "personality_traits": ["confiante", "despojada", "urbana", "autêntica"],
+      "adjectives": ["contemporâneo", "gráfico", "contrastante", "afirmativo"]
+    },
+    "visual_language": {
+      "complexity": "moderate",
+      "ornamentation": "subtle accents",
+      "whitespace_usage": "dois modos coexistindo: generoso nas seções de carrossel/produto (bastante respiro entre cards), mas denso no hero, que é uma colagem de imagens heterogêneas sem respiro entre elas",
+      "visual_weight_distribution": "distributed interest no hero (colagem de múltiplas imagens de peso similar); single hero element nas seções editoriais internas (uma foto grande + um bloco de texto)",
+      "focal_strategy": "distributed interest (hero) combinado com progressive reveal (seções editoriais ao rolar a página)",
+      "contrast_level": "alto — preto quase puro (#111111, MEDIDO) e terracota saturado (#BC4C2A, MEDIDO) contra branco, sem tons intermediários suaves entre eles na UI",
+      "texture_usage": "moderada — textura vem só da fotografia (tecido, areia, pele, água), nunca de textura gráfica de UI (sem grão, sem padrão decorativo, sem ruído)"
+    },
+    "composition": {
+      "hierarchy_method": "typographic hierarchy + color weight (a cor terracota marca especificamente estado ativo, preço e CTA — funciona como um sinalizador de hierarquia, não só decoração)",
+      "balance_type": "mosaic (predominante no hero); o restante do site segue grid regular mais convencional",
+      "flow_direction": "sem direção diagonal dominante — diferente das fotos still-life da própria SOE, aqui a leitura é horizontal (grid/carrossel) ou em colagem sem eixo único (hero)",
+      "grouping_strategy": "produtos agrupados por categoria em carrossel horizontal (ex.: 'Mais Vendidos'); o hero agrupa imagens heterogêneas (still-life + lifestyle + paisagem) numa única composição de colagem",
+      "negative_space_role": "funcional, não protagonista — o espaço em branco separa seções e dá respiro ao grid de produto, mas não é tratado como elemento estético central em si (diferente da fotografia still-life da SOE, onde o espaço vazio de linho é descrito como 'protagonista' no design-dna.json original)"
+    },
+    "imagery": {
+      "photo_treatment": "dois registros distintos coexistindo: still-life de produto em fundo claro neutro (parentesco de espírito com o linho da SOE, mas tom mais frio/cinza-areia do que o creme quente medido nas fotos da SOE) e fotografia editorial em preto e branco de alto contraste para conteúdo de marca/lifestyle",
+      "illustration_style": "não aplicável — nenhuma ilustração observada, só fotografia",
+      "graphic_elements": "nenhum elemento gráfico decorativo identificado — composição é só fotografia e tipografia",
+      "pattern_usage": "não observado — nenhuma estampa gráfica de UI; os únicos padrões visíveis são as texturas naturais dos próprios produtos fotografados (tecido listrado na foto lifestyle, por exemplo)",
+      "image_shape": "quadrado nos cards de produto do carrossel; retangular full-bleed nas seções editoriais e no mosaico do hero"
+    },
+    "interaction_feel": {
+      "feedback_style": "não testado a fundo nesta sessão — não foram capturados estados de hover/foco/clique",
+      "hover_behavior": "não observado diretamente nesta sessão",
+      "transition_personality": "fade-subtle (inferido só do comportamento de blur-up no carregamento de imagem, único comportamento de transição confirmado)",
+      "loading_style": "blur-up de imagem — placeholder borrado que nitidifica progressivamente ao carregar, observado diretamente nos primeiros screenshots desta sessão",
+      "microinteraction_density": "não avaliada com confiança — sessão não cobriu estados de hover/foco o suficiente para classificar"
+    },
+    "brand_voice_in_ui": {
+      "tone": "direto e afirmativo — 'Nossa brisa do mar na cidade', 'Colar moderno e sofisticado com peixes de metal e pedras naturais'. Mais assertivo e editorial do que o tom 'caloroso e sem pressa, feito à mão' já definido para a SOE.",
+      "formality": "informal-contemporâneo, sem o registro afetivo/íntimo que a SOE já adotou para si mesma",
+      "cta_style": "direct imperative — 'Adicionar ao Carrinho', 'Comprar', 'Siga nosso Instagram' — verbos no imperativo direto (MEDIDO via texto real dos botões), o oposto do 'friendly invitation' ('Ver no WhatsApp') que o design-dna.json original da SOE já havia definido como direção de marca",
+      "empty_state_approach": "não observado nesta sessão",
+      "error_tone": "não observado nesta sessão"
+    }
+  },
+  "visual_effects": {
+    "overview": {
+      "effect_intensity": "subtle-accent",
+      "performance_tier": "lightweight",
+      "fallback_strategy": "não testado nesta sessão — não foi verificado comportamento com prefers-reduced-motion nem em dispositivo de baixo desempenho",
+      "primary_technology": "CSS + JavaScript nativo do Wix (blur-up de imagem); nenhum uso de Canvas, WebGL ou Three.js detectado nesta sessão"
+    },
+    "background_effects": { "type": "none", "description": "Nenhum efeito de fundo animado observado — fundos são blocos de cor sólida (branco/bege/cinza claro) alternados entre seções, sem gradiente animado nem textura generativa.", "technology": "n/a", "params": { "color_palette": [], "speed": "n/a", "density": "n/a", "opacity": "n/a", "blend_mode": "n/a" } },
+    "particle_systems": { "enabled": false, "type": "none", "description": "Não observado nesta sessão.", "technology": "n/a", "params": { "count": "0", "shape": "n/a", "size_range": "n/a", "movement_pattern": "n/a", "color_behavior": "n/a", "interaction": "none", "spawn_area": "n/a" } },
+    "3d_elements": { "enabled": false, "type": "none", "description": "Nenhum elemento 3D observado nesta sessão — diferente do Hero 3D (Three.js) já implementado no site da SOE, que não tem paralelo aqui.", "technology": "n/a", "params": { "renderer": "n/a", "lighting": "n/a", "camera": "n/a", "materials": "n/a", "geometry": "n/a", "post_processing": [], "interaction_model": "n/a" } },
+    "shader_effects": { "enabled": false, "type": "none", "description": "Não observado nesta sessão.", "technology": "n/a", "params": { "uniforms": "n/a", "vertex_manipulation": "n/a", "fragment_output": "n/a", "noise_type": "n/a", "distortion": "n/a" } },
+    "scroll_effects": {
+      "parallax": { "enabled": false, "layers": "0", "depth_range": "n/a", "speed_curve": "n/a" },
+      "scroll_triggered_animations": { "enabled": false, "trigger_points": "n/a", "animation_type": "n/a", "scrub_behavior": "Não confirmado nesta sessão — a navegação usou saltos de scroll via JavaScript (window.scrollTo) em vez de rolagem manual contínua, o que pode ter mascarado animações de revelação por scroll que existiriam numa rolagem normal. Registrado como lacuna de cobertura, não como 'confirmadamente ausente' — recomenda-se reteste com rolagem manual antes de descartar esse efeito como referência." },
+      "scroll_morphing": { "enabled": false, "description": "Não observado/não confirmado nesta sessão." }
+    },
+    "text_effects": { "type": "none", "description": "Nenhum efeito de texto animado observado nesta sessão (sem split-letter, glitch, typewriter).", "technology": "n/a", "params": { "split_strategy": "n/a", "animation_per_unit": "n/a", "stagger": "n/a", "effect_style": "n/a" } },
+    "cursor_effects": { "enabled": false, "type": "none", "description": "Não observado nesta sessão.", "params": { "shape": "n/a", "size": "n/a", "blend_mode": "n/a", "trail": "n/a", "interaction_zone": "n/a" } },
+    "image_effects": { "type": "reveal-animation", "description": "Blur-up ao carregar — placeholder de imagem borrado que nitidifica progressivamente. MEDIDO/observado diretamente nos primeiros screenshots desta sessão (visível de forma nítida na primeira captura do hero).", "technology": "CSS blur filter + lazy-load nativo do Wix", "params": { "filter_pipeline": "blur → sharp", "hover_transform": "não testado nesta sessão", "reveal_animation": "blur-to-sharp on load", "distortion_type": "none" } },
+    "glassmorphism_neumorphism": { "enabled": false, "style": "none", "params": { "blur_radius": "n/a", "transparency": "n/a", "border_treatment": "n/a", "shadow_type": "n/a", "light_source_angle": "n/a" } },
+    "canvas_drawings": { "enabled": false, "type": "none", "description": "Não observado nesta sessão.", "technology": "n/a", "params": { "draw_method": "n/a", "animation_loop": "n/a", "color_scheme": "n/a", "responsiveness": "n/a", "interaction": "n/a" } },
+    "svg_animations": { "enabled": false, "type": "none", "description": "Não observado nesta sessão — os ícones parecem ser SVG estático (linha fina), sem animação identificada.", "params": { "animation_method": "n/a", "path_morphing": "n/a", "stroke_animation": "n/a", "filter_effects": "n/a" } },
+    "composite_notes": "Este site de referência usa muito pouco efeito visual 'de tela' — a sofisticação percebida vem inteiramente de tipografia (contraste Avenir Light vs. Poppins Semibold/Bold), cor (terracota + preto contra branco, ambos MEDIDOS) e fotografia editorial, não de WebGL/partículas/shaders. É um dado útil para a reconstrução da SOE: mostra que 'sofisticado e editorial' não exige nenhum dos efeitos pesados já implementados (o Hero 3D em Three.js, por exemplo, não tem paralelo aqui). O design-dna.json original da SOE já registrava 'effect_intensity: none' pelo mesmo motivo (fotos still-life não têm efeito de tela) — esta camada não muda a decisão sobre manter ou não o Hero 3D, só reforça que ele não é uma prática copiada de nenhum benchmark visual real, é uma decisão à parte que precisa ser revisitada por mérito próprio (o P1 do critique da Fase 9 já sinalizava o canvas 3D cobrindo a foto do produto como problema)."
+  }
+}
