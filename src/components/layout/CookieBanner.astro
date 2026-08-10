@@ -1,47 +1,82 @@
 ---
 ---
 
-<div id="cookie-banner" role="dialog" aria-live="polite" aria-label="Aviso de cookies" hidden>
-	<p><strong>Usamos cookies</strong></p>
-	<p>
-		Usamos cookies para melhorar sua experiência neste site. Cookies essenciais ao
-		funcionamento estão sempre ativos; os demais só são usados com sua permissão.
-	</p>
+<div
+	id="cookie-banner"
+	role="dialog"
+	aria-live="polite"
+	aria-label="Aviso de cookies"
+	hidden
+	class="fixed inset-x-0 bottom-0 z-50 border-t border-creme-300 bg-creme-50 p-6 shadow-high"
+>
+	<div class="mx-auto flex max-w-4xl flex-col gap-4">
+		<div>
+			<p class="font-heading text-lg font-semibold text-carvao-900">Usamos cookies</p>
+			<p class="mt-1 text-sm text-carvao-700">
+				Usamos cookies para melhorar sua experiência neste site. Cookies essenciais ao
+				funcionamento estão sempre ativos; os demais só são usados com sua permissão.
+			</p>
+		</div>
 
-	<div class="cookie-banner-acoes">
-		<button id="cookie-aceitar-todos" type="button">Aceitar todos</button>
-		<button id="cookie-rejeitar" type="button">Rejeitar não essenciais</button>
-		<button id="cookie-personalizar" type="button" aria-controls="cookie-painel" aria-expanded="false">
-			Personalizar
-		</button>
+		<div class="cookie-banner-acoes flex flex-wrap gap-3">
+			<button
+				id="cookie-aceitar-todos"
+				type="button"
+				class="rounded-full bg-dourado-500 px-5 py-2.5 text-sm font-semibold text-carvao-900 shadow-low transition-shadow hover:shadow-medium"
+			>
+				Aceitar todos
+			</button>
+			<button
+				id="cookie-rejeitar"
+				type="button"
+				class="rounded-full bg-dourado-500 px-5 py-2.5 text-sm font-semibold text-carvao-900 shadow-low transition-shadow hover:shadow-medium"
+			>
+				Rejeitar não essenciais
+			</button>
+			<button
+				id="cookie-personalizar"
+				type="button"
+				aria-controls="cookie-painel"
+				aria-expanded="false"
+				class="rounded-full border border-carvao-300 px-5 py-2.5 text-sm font-semibold text-carvao-900 transition-colors hover:border-carvao-900"
+			>
+				Personalizar
+			</button>
+		</div>
+
+		<form id="cookie-painel" hidden class="flex flex-col gap-4 border-t border-creme-300 pt-4">
+			<fieldset class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-carvao-900">
+				<legend class="mb-2 font-heading font-semibold">Personalizar cookies</legend>
+
+				<label class="flex items-center gap-2">
+					<input type="checkbox" checked disabled class="h-4 w-4 accent-dourado-500" />
+					Essenciais (sempre ativo)
+				</label>
+
+				<label class="flex items-center gap-2">
+					<input type="checkbox" id="cookie-cat-analise" class="h-4 w-4 accent-dourado-500" />
+					Análise/Desempenho
+				</label>
+
+				<label class="flex items-center gap-2">
+					<input type="checkbox" id="cookie-cat-marketing" class="h-4 w-4 accent-dourado-500" />
+					Marketing
+				</label>
+			</fieldset>
+
+			<button
+				id="cookie-salvar-preferencias"
+				type="submit"
+				class="w-fit rounded-full bg-dourado-500 px-5 py-2.5 text-sm font-semibold text-carvao-900 shadow-low transition-shadow hover:shadow-medium"
+			>
+				Salvar preferências
+			</button>
+		</form>
 	</div>
-
-	<form id="cookie-painel" hidden>
-		<fieldset>
-			<legend>Personalizar cookies</legend>
-
-			<label>
-				<input type="checkbox" checked disabled />
-				Essenciais (sempre ativo)
-			</label>
-
-			<label>
-				<input type="checkbox" id="cookie-cat-analise" />
-				Análise/Desempenho
-			</label>
-
-			<label>
-				<input type="checkbox" id="cookie-cat-marketing" />
-				Marketing
-			</label>
-		</fieldset>
-
-		<button id="cookie-salvar-preferencias" type="submit">Salvar preferências</button>
-	</form>
 </div>
 
 <script>
-	import { lerConsentimento, salvarConsentimento } from "../../lib/consent.js";
+	import { lerConsentimento, salvarConsentimento } from "../../lib/consent";
 
 	const banner = document.getElementById("cookie-banner");
 	const painel = document.getElementById("cookie-painel");
@@ -49,9 +84,12 @@
 	const checkboxAnalise = document.getElementById("cookie-cat-analise");
 	const checkboxMarketing = document.getElementById("cookie-cat-marketing");
 
-	// Só mostra o banner se ainda não houver decisão salva.
+	// Só mostra o banner se ainda não houver decisão salva. Move o foco pro
+	// primeiro botão — achado do audit da Fase 9 (o banner aparecia sem
+	// avisar leitor de tela/teclado).
 	if (banner && !lerConsentimento()) {
 		banner.hidden = false;
+		document.getElementById("cookie-aceitar-todos")?.focus();
 	}
 
 	function fecharBanner() {

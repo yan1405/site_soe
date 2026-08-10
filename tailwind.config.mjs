@@ -7,6 +7,20 @@ export default {
 	content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
 	theme: {
 		extend: {
+			// Fase 9.5: fontes reais, self-hospedadas (public/fonts/), não CDN nem
+			// fonte de sistema — script/serifada pro heading, humanista pro corpo,
+			// como o design-dna.json já pedia desde a Fase 3.
+			fontFamily: {
+				heading: ['"Playfair Display"', "Georgia", "serif"],
+				body: ['"Work Sans"', "-apple-system", "Segoe UI", "sans-serif"],
+			},
+			// Sombras com o mesmo rgba tingido de carvão do design-dna.json —
+			// nunca preto puro genérico.
+			boxShadow: {
+				low: "0 1px 2px rgba(46,42,36,0.06)",
+				medium: "0 4px 12px rgba(46,42,36,0.10)",
+				high: "0 12px 32px rgba(46,42,36,0.14)",
+			},
 			colors: {
 				// Fundo/superfície — #F5F0E4 é o valor medido (não estimado) do
 				// still-life de produto, registrado no CLAUDE.md.

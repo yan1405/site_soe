@@ -8,20 +8,32 @@
 // for adicionado, ele deve checar temConsentimento("analise"/"marketing")
 // antes de se injetar, ou escutar o evento "soe-consentimento-atualizado".
 
+export interface ConsentimentoCookies {
+	essenciais: true;
+	analise: boolean;
+	marketing: boolean;
+	decididoEm: string;
+}
+
+type CategoriaCookie = keyof Pick<ConsentimentoCookies, "essenciais" | "analise" | "marketing">;
+
 const CHAVE_STORAGE = "soe-consentimento-cookies";
 
-export function lerConsentimento() {
+export function lerConsentimento(): ConsentimentoCookies | null {
 	if (typeof localStorage === "undefined") return null;
 	try {
 		const bruto = localStorage.getItem(CHAVE_STORAGE);
-		return bruto ? JSON.parse(bruto) : null;
+		return bruto ? (JSON.parse(bruto) as ConsentimentoCookies) : null;
 	} catch {
 		return null;
 	}
 }
 
-export function salvarConsentimento(preferencias) {
-	const registro = {
+export function salvarConsentimento(preferencias: {
+	analise?: boolean;
+	marketing?: boolean;
+}): ConsentimentoCookies {
+	const registro: ConsentimentoCookies = {
 		essenciais: true,
 		analise: Boolean(preferencias.analise),
 		marketing: Boolean(preferencias.marketing),
@@ -33,7 +45,7 @@ export function salvarConsentimento(preferencias) {
 }
 
 // Categoria "essenciais" é sempre true — não depende de decisão do usuário.
-export function temConsentimento(categoria) {
+export function temConsentimento(categoria: CategoriaCookie): boolean {
 	if (categoria === "essenciais") return true;
 	return Boolean(lerConsentimento()?.[categoria]);
 }

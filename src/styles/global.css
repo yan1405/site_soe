@@ -1,2 +1,67 @@
 @import "tailwindcss";
 @config "../../tailwind.config.mjs";
+
+/* Fontes reais, self-hospedadas em public/fonts/ (baixadas do Google Fonts e
+   servidas localmente — nunca via CDN nem fallback de fonte de sistema).
+   Arquivo único por família porque o Google serviu variable font (cobre todo
+   o eixo de peso 100–900 num arquivo só). */
+@font-face {
+	font-family: "Playfair Display";
+	font-style: normal;
+	font-weight: 400 700;
+	font-display: swap;
+	src: url("/fonts/playfair-display-variable.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Work Sans";
+	font-style: normal;
+	font-weight: 300 700;
+	font-display: swap;
+	src: url("/fonts/work-sans-variable.woff2") format("woff2");
+}
+
+/* Restaura a hierarquia tipográfica que o Preflight do Tailwind zera,
+   usando exatamente a escala do src/styles/design-dna.json (Fase 3) —
+   nenhum valor inventado aqui. */
+@layer base {
+	body {
+		background-color: theme(--color-creme-100);
+		color: theme(--color-carvao-900);
+		font-family: theme(--font-body);
+		line-height: 1.6;
+	}
+
+	h1,
+	h2,
+	h3 {
+		font-family: theme(--font-heading);
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+
+	h1 {
+		font-size: 2.5rem; /* heading_1 do design-dna.json */
+		line-height: 1.15;
+	}
+
+	h2 {
+		font-size: 2rem; /* heading_2 */
+		line-height: 1.2;
+		letter-spacing: normal;
+	}
+
+	h3 {
+		font-size: 1.5rem; /* heading_3 */
+		font-weight: 500;
+		line-height: 1.3;
+		letter-spacing: normal;
+	}
+
+	/* medida de leitura confortável (65–75ch) pros blocos de texto corrido
+	   das páginas institucionais */
+	.medida-leitura {
+		max-width: 70ch;
+	}
+
+}

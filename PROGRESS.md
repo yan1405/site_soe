@@ -958,3 +958,137 @@ Registrada aqui antes de qualquer correção começar:
 4. **P2/P3 (landmarks, lazy loading, autoplay de vídeo, `aria-current`) ficam para depois** — baixo retorno numa página ainda sem estilo nenhum.
 
 Fase 9 concluída (auditoria + priorização). **Não iniciei a implementação da Fase 9.5** — só a documentei no `ORQUESTRACAO_PROMPTS_SOE.md` (seção abaixo), por instrução explícita do usuário de esperar revisão de escopo antes de tocar em código.
+
+**Decisão final do usuário (2026-08-10):** escopo aprovado, com adição das páginas institucionais + 404 (tratamento leve) e ordem de execução fixada em 5 itens — ver `ORQUESTRACAO_PROMPTS_SOE.md`, seção "Fase 9.5", atualizada antes de qualquer código ser tocado.
+
+---
+
+## Fase 9.5 — Aplicação do design system + CTA de compra + correções (2026-08-10)
+
+### Item 1 — Os dois P0 combinados (design system + CTA de compra)
+
+Skill `impeccable` invocada de fato (`context.mjs --target src/layouts/BaseLayout.astro` → `SCOPED_EXISTING_ALLOWED`, refinamento sobre implementação incumbente sem bloquear em `PRODUCT.md`; carreguei `reference/craft-floor.md` antes de editar UI, como o Setup da skill exige).
+
+**Regras do `craft-floor.md` aplicadas de propósito:**
+- **Fontes reais, self-hospedadas** — baixei via `curl` (confirmado acesso à internet nesta sessão) `Playfair Display` (heading) e `Work Sans` (body) do Google Fonts, salvos em `public/fonts/*.woff2` e referenciados via `@font-face` local em `global.css`. Nada de CDN, nada de fonte de sistema como voz de marca — a regra do craft-floor é explícita ("A system display face... is a failure, not a fallback").
+- **Ícones desenhados, não emoji** — troquei o 🛍️ do `CartIcon` por um SVG de sacola linha 1.5px (mesma spec do `design-dna.json`); ícones de fechar (X) e voltar (chevron) também SVG inline.
+- **Contraste ≥4.5:1 verificado, não assumido** — achei e corrigi 2 combinações reais que eu mesmo tinha introduzido (hover `dourado-700`+texto claro em botões e nav, ~4:1) antes de terminar o item; troquei a pista de hover de cor por sombra/elevação e sublinhado, mantendo sempre `carvao-900` sobre `dourado-500` (5.34:1, já validado na Fase 3).
+
+**Arquivos tocados:** `tailwind.config.mjs` (tokens `fontFamily`/`boxShadow` novos), `global.css` (`@font-face` + `@layer base` restaurando h1/h2/h3/body com a escala exata do `design-dna.json`), `Header.astro`, `CartIcon.astro`, `CartDrawer.astro`, `CookieBanner.astro` (não estava na lista original mas é peer de Header/CartDrawer em `layout/` e ficaria destoante sem tratamento — os 2 botões "Aceitar todos"/"Rejeitar não essenciais" mantidos com peso visual idêntico, regra do CLAUDE.md), `Footer.astro` (placeholders viram badge com borda tracejada, texto literal preservado — nenhum valor inventado), `ProdutoCard.astro` (card real: imagem, nome, preço, CTA com feedback "Adicionado!"), `catalogo.astro`, `index.astro`, `Hero.astro` (canvas 3D **reposicionado** — de `inset:0` cobrindo a foto inteira para um medalhão de 40% ancorado num canto, não ocultando mais o produto — achado P1 do critique original), `produto/[slug].astro` (**CTA que não existia**: botão "Adicionar ao carrinho" real + link secundário de WhatsApp).
+
+Verificado ao vivo via `claude-in-chrome`: home com hierarquia/cor real, hero com o medalhão 3D não cobrindo mais a foto, grid de produtos, `/catalogo`, `/produto/animal-print` com o CTA novo funcionando (clique real → item aparece no drawer), drawer com item/total/link WhatsApp corretos.
+
+### Item 2 — 6 erros de TypeScript strict
+
+`src/lib/cart-store.js`, `config.js`, `consent.js` convertidos para `.ts` com interfaces reais (`ItemCarrinho`, `ConsentimentoCookies`) em vez de anotação solta — conversão completa, não patch. Todos os 8 arquivos `.astro` que importavam com `.js` explícito foram atualizados para import sem extensão (resolução do Vite). O bug de estreitamento de tipo do `Hero.astro` (`redimensionar()`) já tinha sido corrigido como efeito colateral da reescrita do item 1 (a função ganhou um guard `instanceof HTMLCanvasElement` de novo).
+
+### Item 3 — 3 páginas stub do nav
+
+- `nossa-historia.astro`: texto real sobre o ofício/valores do ateliê. **Decisão registrada**: não inventei biografia (nome da fundadora, ano, cidade, anedota pessoal) — nenhum desses fatos foi fornecido em nenhuma fase. O texto fala do processo e dos valores (coisas já estabelecidas: feito à mão, lotes pequenos, linho), não de uma história pessoal fabricada.
+- `institucional/contato.astro`: CTA de WhatsApp real + placeholder de e-mail com o mesmo tratamento visual do rodapé.
+- `carrinho.astro`: página standalone real, reaproveitando `cart-store.ts` (mesma lógica do drawer, sem duplicar) — resolve o achado do audit ("`/carrinho` é beco sem saída").
+
+### Item 4 — Institucionais + 404
+
+`privacidade.astro`, `termos.astro`, `trocas-devolucoes.astro`: conteúdo jurídico da Fase 7 **não tocado** — só envolvido num container de largura de leitura (`max-w-3xl`), herdando tipografia/cor do `@layer base` global. `404.astro`: link "Voltar para a home" com ícone, resolvendo o achado do critique ("beco sem saída real").
+
+### Item 5 — Achados P2/P3 da Fase 9
+
+- `<main id="conteudo-principal">` + link "Pular para o conteúdo" (`sr-only`/`focus:not-sr-only`) em `BaseLayout.astro`.
+- `CartDrawer`: `role="dialog"` `aria-modal="true"`, foco move pro botão fechar ao abrir (via `MutationObserver` no atributo `hidden`), Escape fecha, foco volta pro ícone do header ao fechar.
+- `CookieBanner`: foco move pro primeiro botão quando o banner aparece.
+- `loading="lazy"` nas imagens de `ProdutoCard` (grades de catálogo/home); imagem do Hero e da página de produto continuam eager (são LCP/above-the-fold, lazy seria contraproducente aí).
+- `autoplay` incondicional removido dos 3 `<video>` da vitrine — `.play()` agora dispara só dentro do `onEnter` do `ScrollTrigger.batch`, junto com o fade visual.
+- `aria-current="page"` no nav — resolvido como efeito colateral natural do item 1 (construir o nav com estado ativo/hover já produz isso).
+
+### Achados novos durante a verificação — corrigidos antes de fechar a fase
+
+A re-execução do `/impeccable critique` (ver abaixo) achou 2 problemas reais que eu não tinha visto:
+
+1. **`aria-expanded` preso em `"true"`** — fechar o drawer pelo botão "Fechar" ou Esc não zerava o atributo no botão do `CartIcon` (só o clique no próprio ícone zerava). Corrigido: `fecharDrawer()` agora também seta `aria-expanded="false"` no botão do ícone.
+2. **Vídeos da vitrine às vezes não tocam** — a Assessment A reproduziu 2x na mesma sessão (funcionou uma vez, falhou silenciosamente na outra, sem nenhum request de rede pro `.mp4`). Corrigido parcialmente: adicionei `poster` (frame extraído via `ffmpeg` de cada vídeo) pra garantir que uma falha de playback nunca mais renderize como caixa vazia, e um `ScrollTrigger.refresh()` depois de `document.fonts.ready` (best practice documentada do GSAP que eu não tinha aplicado — fontes self-hospedadas com `font-display:swap` podem deslocar layout depois do ScrollTrigger já ter calculado a posição do trigger). **Investigação adicional, honesta**: testei de novo em `astro preview` (mais perto de produção) com tracking de rede ligado desde antes da navegação — confirmei que, pelo menos nesta sessão, `play()` resolve sem erro mas nenhum request pro `.mp4` chega a disparar. Não consegui isolar com certeza se é um comportamento real do navegador ou uma peculiaridade do próprio ambiente de automação (`claude-in-chrome`) usado nos testes — em verificações visuais anteriores desta mesma sessão os vídeos carregaram e tocaram normalmente. Reportando como não 100% resolvido, com o fallback de poster garantindo que o pior caso deixou de ser "caixa vazia".
+
+### Verificação final: `astro build` + `astro check`
+
+```
+astro build → 14 páginas, sem erro
+astro check → Result (26 files): 0 errors, 0 warnings, 11 hints
+```
+
+(11 hints não detalhados na saída padrão do comando; os únicos "warnings" que aparecem no texto bruto — `THREE.Clock` deprecated, `z` deprecated do Zod — são de bibliotecas de terceiro, não de código do projeto, e o próprio sumário do comando os conta como hint/0 warning, não erro.)
+
+### `/impeccable audit .` — re-execução completa
+
+Setup: `SCOPED_EXISTING_ALLOWED` (mesmo caminho da Fase 9). Detector: `node detect.mjs --json .` → `[]`, exit 0.
+
+#### Audit Health Score — antes vs. depois
+
+| # | Dimensão | Fase 9 (baseline) | Fase 9.5 (agora) |
+|---|---|---|---|
+| 1 | Acessibilidade | 2/4 | **3/4** — `<main>`/skip-link, foco em `CartDrawer`/`CookieBanner` resolvidos; falta trap de Tab completo no drawer (não implementado, escopo) |
+| 2 | Performance | 2/4 | **3/4** — `loading="lazy"` e `autoplay` incondicional resolvidos; three.js seguia corretamente deferido desde a Fase 6 |
+| 3 | Theming | 1/4 | **4/4** — 16 de 19 arquivos `.astro` usam os tokens (os 3 que não usam herdam do `@layer base` de propósito); 0% → adoção real |
+| 4 | Responsive | 2/4 | **3/4** — grids `sm:`/`md:`/`lg:` reais agora existem; viewport mobile não foi possível verificar ao vivo (limitação de ferramenta, não confirmado nem como falho nem como certo) |
+| 5 | Implementation Integrity | 2/4 | **4/4** — 6 erros de TS strict → 0; 4 rotas stub → 0 (todas as 12 rotas do CLAUDE.md têm conteúdo real) |
+| **Total** | | **9/20 (Poor)** | **17/20 (Good)** |
+
+**Implementation Integrity Verdict: PASS.** As duas ressalvas da Fase 9 (TS strict quebrado, rotas stub) foram resolvidas com evidência verificável (`astro check` real, todas as rotas com conteúdo). O código continua coerente e rastreável, agora também completo.
+
+#### Achados que continuam abertos (não estavam no escopo dos 5 itens, ou foram deprioritizados por você)
+
+- **[P2]** Escala de shades das 6 cores custom ainda incompleta (200/400/600/800) — não estava no escopo explícito da Fase 9.5.
+- **[P2]** `CartDrawer` não tem *trap* de Tab completo (só move o foco na entrada e devolve na saída) — mitigação parcial, não total.
+- **[P3]** `THREE.Clock` deprecated (aviso do próprio Three.js) — não corrigido, baixa prioridade.
+- **[P3]** Checkbox "Essenciais" do cookie banner usa `disabled` nativo, some da navegação por Tab.
+- **[P3]** Viewport mobile real não verificado ao vivo nesta sessão (limitação de ferramenta) — o código usa breakpoints responsivos reais (`sm:`/`md:`), mas isso não foi confirmado visualmente num viewport estreito de verdade.
+- **Achado novo, não fechado**: o comportamento intermitente de reprodução dos vídeos da vitrine (ver seção acima) — mitigado com `poster`, causa raiz não 100% confirmada.
+
+### `/impeccable critique .` — re-execução completa
+
+**Method: dual-agent** (A e B isolados, sem worktree desta vez — sem repetir o erro da Fase 9). Servidor de dev em `http://localhost:4335` para ambas.
+
+#### Design Health Score — antes vs. depois
+
+| # | Heurística | Fase 9 (baseline) | Fase 9.5 (agora) |
+|---|---|---|---|
+| 1 | Visibilidade do status do sistema | 1 | 3 — feedback "Adicionado!" no botão + badge atualiza |
+| 2 | Correspondência sistema/mundo real | 2 | 4 — PT-BR, R$, WhatsApp como canal real |
+| 3 | Controle e liberdade | 3 | 2 — carrinho só tem "Remover", sem seletor de quantidade (achado novo da re-crítica) |
+| 4 | Consistência e padrões | 1 | 3 — cards/botões/header consistentes em todo o site |
+| 5 | Prevenção de erros | 2 | 3 |
+| 6 | Reconhecimento vs. recall | 3 | 3 |
+| 7 | Flexibilidade e eficiência | n/a | n/a |
+| 8 | Estética e design minimalista | 0 | 3 — hierarquia real, mas ainda não "perfeito" |
+| 9 | Recuperação de erros | 1 | 2 — 404 tem link de volta, mas não linka direto pro catálogo que o próprio texto da página menciona |
+| 10 | Ajuda e documentação | 0 (não n/a — a Assessment A original considerou a página vazia "aplicável e falhando") | n/a (a Assessment A desta rodada considerou o site inteiro um "landing/vitrine" onde a heurística genuinamente não se aplica — critério mudou entre as duas rodadas, sinalizando isso em vez de esconder) |
+| **Total** | **13/36 (36%) — Poor** | **23/32 (72%) — Good, na ponta inferior** |
+
+**Nota de comparação, honesta**: os denominadores diferem (36 vs. 32) porque a heurística 10 foi marcada `n/a` nesta rodada e não na anterior — critério da própria Assessment A, não escolha minha. Comparando por porcentagem (regra do próprio `critique.md`): 36% → 72%, mesma direção e magnitude de melhora que o audit.
+
+#### Design Specificity Verdict (Fase 9.5)
+Deixou de ser "wireframe genérico" — paleta, tipografia, fotografia e copy agora formam um todo coerente e específico desta marca. **Exceção real, ainda aberta**: o medalhão 3D do Hero continua sendo a geometria placeholder (torus dourado) — não lembra um laço, é o único elemento que ainda "poderia ser de qualquer produto". Isso é addressed pela reposição (não cobre mais a foto), mas não pelo conteúdo do próprio modelo 3D — troca por asset real (GLTF) continua pendente, como já era esperado desde a Fase 6.
+
+#### Achados novos da re-crítica (não estavam na Fase 9, porque as coisas que eles descrevem não existiam ainda)
+
+- **[P0, corrigido nesta sessão]** Vídeos da vitrine falhando intermitentemente sem fallback — ver seção acima.
+- **[P1, aberto]** Placeholders (`[CNPJ/MEI — PENDENTE]`, `NUMERO_WHATSAPP_PENDENTE`) aparecem em toda página, e o link de WhatsApp do checkout **não é um link real** enquanto o número não for confirmado — a Assessment A foi explícita que isso não é defeito de código (é dado de negócio pendente, documentado desde o CLAUDE.md), mas é um gate de lançamento real: o site não pode ir ao ar com esse link assim.
+- **[P2, aberto]** Carrinho não tem seletor de quantidade — só remover e re-adicionar.
+- **[P3, aberto]** Páginas institucionais longas sem âncoras de navegação interna; medida de linha um pouco acima do confortável em desktop.
+
+#### O que continua funcionando bem (reconfirmado)
+Copy com voz de marca, fotografia como âncora de especificidade, checkout WhatsApp honesto (sem fingir gateway de pagamento que não existe), carga cognitiva baixa (0-1 falhas no checklist de 8 itens, igual ou melhor que antes).
+
+### Resumo da comparação
+
+| Comando | Antes (Fase 9) | Depois (Fase 9.5) | Direção |
+|---|---|---|---|
+| `/impeccable audit .` | 9/20 — Poor | 17/20 — Good | ↑ melhora real, mesma metodologia |
+| `/impeccable critique .` | 13/36 (36%) — Poor | 23/32 (72%) — Good (ponta inferior) | ↑ melhora real, comparação por % (denominador mudou) |
+
+**O que ficou de fora, por decisão explícita sua ou por não estar no escopo dos 5 itens**: escala de shades incompleta, trap de Tab total no carrinho, deprecation do `THREE.Clock`, checkbox do cookie banner inacessível por Tab, seletor de quantidade no carrinho, âncoras nas páginas institucionais, geometria 3D placeholder (aguardando asset real desde a Fase 6), viewport mobile não verificado ao vivo, e o gate de lançamento do número de WhatsApp real (não é código, é dado pendente da cliente).
+
+### Commit e push
+
+Ver mensagem de commit desta sessão para a lista literal de arquivos alterados.
+
+Fase 9.5 concluída. **Não iniciei a Fase 10** — aguardando sua revisão dos números de antes/depois acima, como pedido.

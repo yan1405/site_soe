@@ -7,22 +7,43 @@ const links = [
 	{ href: "/nossa-historia", label: "Nossa História" },
 	{ href: "/institucional/contato", label: "Contato" },
 ];
+
+const caminhoAtual = Astro.url.pathname;
 ---
 
-<header>
-	<a href="/" class="logo">SOE Acessórios</a>
+<header class="sticky top-0 z-40 border-b border-creme-300 bg-creme-100/95 backdrop-blur-sm">
+	<div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+		<a href="/" class="font-heading text-xl font-semibold tracking-tight text-carvao-900">
+			SOE Acessórios
+		</a>
 
-	<nav aria-label="Navegação principal">
-		<ul>
-			{
-				links.map((link) => (
-					<li>
-						<a href={link.href}>{link.label}</a>
-					</li>
-				))
-			}
-		</ul>
-	</nav>
+		<nav aria-label="Navegação principal" class="flex-1">
+			<ul class="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-sm font-medium">
+				{
+					links.map((link) => {
+						const ativo =
+							link.href === "/" ? caminhoAtual === "/" : caminhoAtual.startsWith(link.href);
+						return (
+							<li>
+								<a
+									href={link.href}
+									aria-current={ativo ? "page" : undefined}
+									class:list={[
+										"pb-1 text-carvao-900 transition-colors",
+										ativo
+											? "border-b-2 border-dourado-500"
+											: "border-b-2 border-transparent hover:border-dourado-500",
+									]}
+								>
+									{link.label}
+								</a>
+							</li>
+						);
+					})
+				}
+			</ul>
+		</nav>
 
-	<CartIcon />
+		<CartIcon />
+	</div>
 </header>

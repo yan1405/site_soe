@@ -1,7 +1,86 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { NUMERO_WHATSAPP_PENDENTE } from "../lib/config";
+
+// Rota dedicada do carrinho — achado do audit da Fase 9: /carrinho estava
+// listada nas rotas do CLAUDE.md mas só o drawer do header era funcional.
+// Reaproveita o mesmo cart-store.ts do CartDrawer, sem duplicar lógica.
 ---
 
 <BaseLayout title="Carrinho">
-	<h1>Carrinho</h1>
+	<div class="mx-auto max-w-2xl px-6 py-16">
+		<h1 class="text-carvao-900">Carrinho</h1>
+
+		<ul id="carrinho-pagina-itens" class="mt-8 flex flex-col gap-3"></ul>
+
+		<div class="mt-8 space-y-4 border-t border-creme-300 pt-6">
+			<p id="carrinho-pagina-total" class="font-heading text-xl font-semibold text-carvao-900"></p>
+			<a
+				id="carrinho-pagina-whatsapp"
+				href="#"
+				target="_blank"
+				rel="noopener noreferrer"
+				data-whatsapp={NUMERO_WHATSAPP_PENDENTE}
+				class="inline-flex items-center justify-center gap-2 rounded-full bg-dourado-500 px-6 py-3 text-sm font-semibold text-carvao-900 shadow-low transition-shadow hover:shadow-medium"
+			>
+				Finalizar no WhatsApp
+			</a>
+			<p>
+				<a href="/catalogo" class="text-sm font-medium text-carvao-700 underline decoration-dourado-500 underline-offset-4 hover:text-carvao-900">
+					Continuar vendo o catálogo
+				</a>
+			</p>
+		</div>
+	</div>
 </BaseLayout>
+
+<script>
+	import { listarItens, removerItem, gerarMensagemWhatsApp } from "../lib/cart-store";
+
+	const lista = document.getElementById("carrinho-pagina-itens");
+	const totalEl = document.getElementById("carrinho-pagina-total");
+	const linkWhatsApp = document.getElementById("carrinho-pagina-whatsapp");
+
+	function renderizar() {
+		if (!lista || !totalEl || !linkWhatsApp) return;
+
+		const itens = listarItens();
+		lista.innerHTML = "";
+
+		if (itens.length === 0) {
+			const vazio = document.createElement("li");
+			vazio.textContent = "Seu carrinho está vazio — que tal dar uma olhada no catálogo?";
+			vazio.className = "text-carvao-700";
+			lista.append(vazio);
+		}
+
+		for (const item of itens) {
+			const li = document.createElement("li");
+			li.className = "flex items-center justify-between gap-3 rounded-xl bg-creme-50 p-4 shadow-low";
+
+			const info = document.createElement("span");
+			info.className = "text-carvao-900";
+			info.textContent = `${item.quantidade}x ${item.nome} — R$ ${(item.preco * item.quantidade).toFixed(2)}`;
+
+			const botaoRemover = document.createElement("button");
+			botaoRemover.type = "button";
+			botaoRemover.textContent = "Remover";
+			botaoRemover.className =
+				"shrink-0 text-xs font-medium text-carvao-700 underline decoration-dourado-500 underline-offset-2 hover:text-carvao-900";
+			botaoRemover.addEventListener("click", () => removerItem(item.slug));
+
+			li.append(info, botaoRemover);
+			lista.append(li);
+		}
+
+		const total = itens.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
+		totalEl.textContent = `Total: R$ ${total.toFixed(2)}`;
+
+		const numero = linkWhatsApp.dataset.whatsapp;
+		const mensagem = encodeURIComponent(gerarMensagemWhatsApp());
+		linkWhatsApp.setAttribute("href", `https://wa.me/${numero}?text=${mensagem}`);
+	}
+
+	window.addEventListener("soe-carrinho-atualizado", renderizar);
+	renderizar();
+</script>

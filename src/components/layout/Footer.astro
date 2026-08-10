@@ -1,17 +1,40 @@
 ---
-import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config.js";
+import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
+
+// Tratamento visual dos placeholders pendentes: continuam literais (nenhum
+// valor real inventado), só ganham um selo que os diferencia de "site
+// quebrado" — ver achado do /impeccable critique (Fase 9).
 ---
 
-<footer>
-	<p>SOE Acessórios — [CNPJ/MEI — PENDENTE] — [ENDEREÇO — PENDENTE]</p>
-	<p>
-		Contato: [E-MAIL_PENDENTE] · WhatsApp: {NUMERO_WHATSAPP_PENDENTE}
-	</p>
-	<nav aria-label="Links institucionais">
-		<ul>
-			<li><a href="/institucional/privacidade">Política de Privacidade</a></li>
-			<li><a href="/institucional/termos">Termos de Uso</a></li>
-			<li><a href="/institucional/trocas-devolucoes">Trocas e Devoluções</a></li>
-		</ul>
-	</nav>
+<footer class="bg-carvao-900 px-6 py-10 text-creme-100">
+	<div class="mx-auto flex max-w-6xl flex-col gap-6 text-sm">
+		<p>
+			SOE Acessórios —
+			<span class="rounded-full border border-dashed border-creme-500/60 px-2 py-0.5 text-creme-300">
+				[CNPJ/MEI — PENDENTE]
+			</span>
+			—
+			<span class="rounded-full border border-dashed border-creme-500/60 px-2 py-0.5 text-creme-300">
+				[ENDEREÇO — PENDENTE]
+			</span>
+		</p>
+		<p>
+			Contato:
+			<span class="rounded-full border border-dashed border-creme-500/60 px-2 py-0.5 text-creme-300">
+				[E-MAIL_PENDENTE]
+			</span>
+			· WhatsApp:
+			<span class="rounded-full border border-dashed border-creme-500/60 px-2 py-0.5 text-creme-300">
+				{NUMERO_WHATSAPP_PENDENTE}
+			</span>
+		</p>
+
+		<nav aria-label="Links institucionais">
+			<ul class="flex flex-wrap gap-x-6 gap-y-2">
+				<li><a class="hover:text-dourado-500" href="/institucional/privacidade">Política de Privacidade</a></li>
+				<li><a class="hover:text-dourado-500" href="/institucional/termos">Termos de Uso</a></li>
+				<li><a class="hover:text-dourado-500" href="/institucional/trocas-devolucoes">Trocas e Devoluções</a></li>
+			</ul>
+		</nav>
+	</div>
 </footer>

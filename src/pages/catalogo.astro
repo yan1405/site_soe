@@ -6,7 +6,7 @@ import ProdutoCard from "../components/produto/ProdutoCard.astro";
 const produtos = await getCollection("produtos");
 
 // Resolve os arquivos em src/assets/produtos/ referenciados pelo campo `imagens`
-// de cada entrada (ainda sem estilização — Fase 2 é só dados).
+// de cada entrada.
 const imagensDisponiveis = import.meta.glob<{ default: ImageMetadata }>(
 	"/src/assets/produtos/*",
 	{ eager: true },
@@ -18,25 +18,33 @@ function resolverImagem(nomeArquivo: string) {
 ---
 
 <BaseLayout title="Catálogo">
-	<h1>Catálogo</h1>
+	<div class="mx-auto max-w-6xl px-6 py-16">
+		<div class="mb-10 max-w-2xl">
+			<h1 class="text-carvao-900">Catálogo</h1>
+			<p class="mt-3 text-carvao-700">
+				Uma seleção pequena e curada dos nossos carros-chefe — o catálogo completo, com todas as
+				variações, fica no nosso WhatsApp.
+			</p>
+		</div>
 
-	<ul>
-		{
-			produtos.map((produto) => {
-				const imagem = resolverImagem(produto.data.imagens[0]);
-				return (
-					<ProdutoCard
-						slug={produto.id}
-						nome={produto.data.nome}
-						descricaoCurta={produto.data.descricaoCurta}
-						preco={produto.data.preco}
-						disponivel={produto.data.disponivel}
-						imagemSrc={imagem?.src}
-						imagemWidth={imagem?.width}
-						imagemHeight={imagem?.height}
-					/>
-				);
-			})
-		}
-	</ul>
+		<ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+			{
+				produtos.map((produto) => {
+					const imagem = resolverImagem(produto.data.imagens[0]);
+					return (
+						<ProdutoCard
+							slug={produto.id}
+							nome={produto.data.nome}
+							descricaoCurta={produto.data.descricaoCurta}
+							preco={produto.data.preco}
+							disponivel={produto.data.disponivel}
+							imagemSrc={imagem?.src}
+							imagemWidth={imagem?.width}
+							imagemHeight={imagem?.height}
+						/>
+					);
+				})
+			}
+		</ul>
+	</div>
 </BaseLayout>

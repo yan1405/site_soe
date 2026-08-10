@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config.js";
+import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
 
 // Rascunho estruturado (CDC art. 49, Decreto 7.962/2013) — NÃO é
 // aconselhamento jurídico, precisa de revisão por advogado antes de
@@ -8,6 +8,7 @@ import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config.js";
 ---
 
 <BaseLayout title="Trocas e Devoluções">
+	<div class="mx-auto max-w-3xl px-6 py-16 medida-leitura">
 	<h1>Trocas, Devoluções e Direito de Arrependimento</h1>
 
 	<h2>1. Direito de arrependimento</h2>
@@ -51,4 +52,5 @@ import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config.js";
 		Nas devoluções por direito de arrependimento, o custo do frete de devolução é de
 		responsabilidade da SOE Acessórios.
 	</p>
+	</div>
 </BaseLayout>

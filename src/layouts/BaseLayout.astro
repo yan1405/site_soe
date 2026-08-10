@@ -36,8 +36,16 @@ const {
 
 	</head>
 	<body>
+		<a
+			href="#conteudo-principal"
+			class="sr-only rounded-full bg-dourado-500 px-5 py-2.5 text-sm font-semibold text-carvao-900 focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100]"
+		>
+			Pular para o conteúdo
+		</a>
 		<Header />
-		<slot />
+		<main id="conteudo-principal">
+			<slot />
+		</main>
 		<Footer />
 		<CartDrawer />
 		<CookieBanner />

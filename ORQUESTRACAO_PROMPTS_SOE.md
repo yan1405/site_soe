@@ -384,12 +384,16 @@ Cole no PROGRESS.md a saída literal dos dois comandos — não um resumo seu do
 
 **Adicionada em 2026-08-09, depois da Fase 9 rodar de verdade.** Não existia no plano original. Depende do achado da Fase 9 (`/impeccable audit .` + `/impeccable critique .`, ver PROGRESS.md): os dois problemas P0 do critique — "zero design aplicado em qualquer página" e "página de produto sem nenhuma ação de compra" — foram tratados pelo usuário como **o mesmo problema**, não dois itens separados, porque um `/impeccable polish` avulso sobre um projeto sem CSS nenhum não teria em que se apoiar. Por isso é fase própria, com escopo explícito, e não um comando solto.
 
-**Regra de ordem, decidida pelo usuário em 2026-08-09:** dentro desta fase, corrigir primeiro os dois P0 juntos. Só depois — em continuação da mesma revisão de fase, não antes — seguem, nesta ordem:
-1. Os 6 erros de TypeScript strict achados pela Fase 9 (`Hero.astro` + `cart-store.js`/`config.js`/`consent.js` sem tipos) — mecânico, não depende de decisão de design.
-2. As 3 páginas stub do nav principal (`nossa-historia.astro`, `institucional/contato.astro`, `carrinho.astro` como rota standalone).
-3. Os achados P2/P3 da Fase 9 (landmark `<main>`/skip-link, gestão de foco em `CartDrawer`/`CookieBanner`, `loading="lazy"` nas imagens de produto, `autoplay` incondicional dos vídeos da vitrine, `aria-current` no nav) ficam para depois — baixo retorno numa página que ainda não tinha estilo nenhum até este ponto.
+**Escopo final aprovado em 2026-08-10** (adição à decisão de 2026-08-09: páginas institucionais + 404 entraram no escopo desta mesma fase — tratamento leve, não uma fase separada, porque herdam Header/Footer/tipografia já escopados nos outros itens e não precisam de componente novo).
 
-**Escopo mínimo dos dois P0 combinados** (definido pelo usuário, aguardando revisão antes de qualquer implementação):
+**Regra de ordem, sem pular etapa:**
+1. Os dois P0 combinados: aplicar os tokens de `src/styles/design-dna.json`/`tailwind.config.mjs` via skill `impeccable` (`/impeccable shape` e/ou `/impeccable polish`) + CTA de compra na página de produto.
+2. Os 6 erros de TypeScript strict achados pela Fase 9 (`Hero.astro` + `cart-store.js`/`config.js`/`consent.js` sem tipos, ou conversão para `.ts` se for a correção mais direta) — mecânico, não depende de decisão de design.
+3. As 3 páginas stub do nav principal (`nossa-historia.astro`, `institucional/contato.astro`, `carrinho.astro` como rota standalone).
+4. As páginas institucionais + 404 (adicionadas ao escopo em 2026-08-10): `institucional/privacidade.astro`, `termos.astro`, `trocas-devolucoes.astro` (texto jurídico já real da Fase 7 — **não mexer no conteúdo**, só parar de renderizar em HTML cru) e `404.astro` (com link de volta para a home — achado do critique: hoje é beco sem saída).
+5. Os achados P2/P3 da Fase 9 (landmark `<main>`/skip-link, gestão de foco em `CartDrawer`/`CookieBanner`, `loading="lazy"` nas imagens de produto, `autoplay` incondicional dos vídeos da vitrine, `aria-current` no nav).
+
+**Escopo mínimo dos dois P0 combinados (item 1):**
 - `Header.astro`
 - `ProdutoCard.astro`
 - `/catalogo`
@@ -399,9 +403,11 @@ Cole no PROGRESS.md a saída literal dos dois comandos — não um resumo seu do
 - `CartDrawer.astro`/`CartIcon.astro`
 - `Footer.astro` — com tratamento visual dos placeholders pendentes (`[CNPJ/MEI — PENDENTE]` etc.), **sem inventar valor real** para nenhum deles (placeholder continua placeholder — só ganha tratamento visual que o diferencie de "site quebrado", conforme sinalizado no critique)
 
-**Skill a usar:** `impeccable` (`/impeccable shape` e/ou `/impeccable polish`, conforme os comandos sugeridos nos achados P0/P1 do audit/critique da Fase 9 no PROGRESS.md) — aplicando os tokens já existentes em `src/styles/design-dna.json`/`tailwind.config.mjs` (Fase 3), não criando paleta nova.
+**Skill a usar (item 1):** `impeccable` (`/impeccable shape` e/ou `/impeccable polish`) — aplicando os tokens já existentes em `src/styles/design-dna.json`/`tailwind.config.mjs` (Fase 3), não criando paleta nova.
 
-**Checkpoint:** esta fase não deve começar a ser implementada até o usuário revisar e confirmar o escopo acima explicitamente — registrado assim por instrução direta dele em 2026-08-09.
+**Barra de aceite ao final de todos os 5 itens:** `npx astro build` sem erro; `npx astro check` com **0 erros** (é a barra de aceite do item 2 e da promessa "TypeScript strict" do CLAUDE.md); rodar `/impeccable audit .` e `/impeccable critique .` de novo e comparar explicitamente com a baseline da Fase 9 (9/20 no audit, 13/36 no critique); colar os dois relatórios completos no PROGRESS.md, seção "Fase 9.5"; commit e push ao final. Não iniciar a Fase 10 sem revisão dos números de antes/depois pelo usuário.
+
+**Checkpoint anterior, já cumprido em 2026-08-10:** esta fase não deveria começar a ser implementada até o usuário revisar e confirmar o escopo — confirmação recebida nesta data, com a adição das institucionais + 404 acima.
 
 ---
 

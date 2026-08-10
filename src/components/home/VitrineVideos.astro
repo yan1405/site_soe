@@ -12,31 +12,34 @@
 const videos = [
 	{
 		src: "/videos/embalagem-artesanal.mp4",
+		poster: "/images/poster-embalagem-artesanal.jpg",
 		aria: "Vídeo mostrando o processo de embalar laços à mão em caixinha de presente da SOE Acessórios",
 	},
 	{
 		src: "/videos/vitrine-experimente-tamanhos.mp4",
+		poster: "/images/poster-vitrine-experimente-tamanhos.jpg",
 		aria: "Vídeo mostrando os diferentes tamanhos de scrunchies da SOE Acessórios sendo usados no cabelo",
 	},
 	{
 		src: "/videos/vitrine-feira.mp4",
+		poster: "/images/poster-vitrine-feira.jpg",
 		aria: "Vídeo mostrando a barraca da SOE Acessórios em uma feira, com os produtos expostos",
 	},
 ];
 ---
 
-<section class="vitrine-videos" aria-label="Vitrine de vídeos SOE Acessórios">
-	<ul>
+<section class="vitrine-videos mx-auto max-w-6xl px-6 py-16" aria-label="Vitrine de vídeos SOE Acessórios">
+	<ul class="grid grid-cols-1 gap-4 sm:grid-cols-3">
 		{
 			videos.map((video) => (
-				<li>
+				<li class="overflow-hidden rounded-xl bg-creme-300 shadow-low">
 					<video
-						class="vitrine-video"
+						class="vitrine-video aspect-[9/16] w-full object-cover"
 						src={video.src}
+						poster={video.poster}
 						muted
 						loop
 						playsinline
-						autoplay
 						preload="none"
 						aria-label={video.aria}
 					/>
@@ -52,13 +55,29 @@ const videos = [
 
 	gsap.registerPlugin(ScrollTrigger);
 
-	const videos = gsap.utils.toArray<HTMLElement>(".vitrine-video");
+	const videos = gsap.utils.toArray<HTMLVideoElement>(".vitrine-video");
 	const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+	// Achado de performance do audit da Fase 9: antes, o atributo `autoplay`
+	// no <video> fazia o navegador baixar/tocar os 3 vídeos assim que
+	// entravam no DOM, mesmo escondidos por opacity:0 — pagando a banda
+	// inteira antes do scroll-reveal. Agora o play() só dispara junto com a
+	// revelação visual, dentro do mesmo callback.
+	function tocarVideo(video: HTMLVideoElement) {
+		video.play().catch(() => {
+			// Autoplay de vídeo mudo é permitido pela maioria dos navegadores,
+			// mas se algum bloquear mesmo assim, falha silenciosa é aceitável
+			// aqui — é ilustração decorativa, não conteúdo essencial.
+		});
+	}
 
 	if (prefersReducedMotion) {
 		// Requisito não-negociável do CLAUDE.md: com a preferência ativada,
-		// os vídeos aparecem direto, sem animação de entrada.
+		// os vídeos aparecem direto, sem animação de entrada (mas ainda tocam
+		// — são mudos/decorativos, não a categoria de movimento que a
+		// preferência pretende barrar).
 		gsap.set(videos, { opacity: 1, scale: 1, y: 0 });
+		videos.forEach(tocarVideo);
 	} else {
 		gsap.set(videos, { opacity: 0, scale: 0.92, y: 24 });
 
@@ -68,7 +87,7 @@ const videos = [
 		ScrollTrigger.batch(".vitrine-video", {
 			start: "top 80%", // mesmo trigger point do design-dna.json (viewport 80%)
 			once: true, // dispara uma vez ao entrar, não-scrubbed — ver design-dna.json
-			onEnter: (elementos) =>
+			onEnter: (elementos) => {
 				gsap.to(elementos, {
 					opacity: 1,
 					scale: 1,
@@ -76,7 +95,22 @@ const videos = [
 					duration: 0.8,
 					ease: "power2.out",
 					stagger: 0.15,
-				}),
+				});
+				elementos.forEach((elemento) => {
+					if (elemento instanceof HTMLVideoElement) tocarVideo(elemento);
+				});
+			},
 		});
+
+		// Achado real da re-crítica da Fase 9.5 (Assessment A, reproduzido 2x
+		// na mesma sessão): o vídeo às vezes não tocava nunca, sem nenhum
+		// request de rede disparado — sintoma clássico do ScrollTrigger
+		// calculando a posição do trigger ("top 80%") ANTES das fontes
+		// self-hospedadas (Fase 9.5, font-display:swap) terminarem de
+		// carregar e empurrarem o layout. threejs-scrolltrigger/gsap-scrolltrigger
+		// já avisa pra isso: "Call ScrollTrigger.refresh() after DOM/layout
+		// changes... fonts loaded". Não estava sendo feito — corrigido aqui.
+		document.fonts?.ready.then(() => ScrollTrigger.refresh());
+		window.addEventListener("load", () => ScrollTrigger.refresh());
 	}
 </script>

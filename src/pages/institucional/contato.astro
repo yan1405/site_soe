@@ -1,7 +1,35 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
+
+// Sem backend/formulário neste projeto (ver CLAUDE.md — carrinho e contato
+// são 100% client-side) — o canal de contato real é o WhatsApp, com e-mail
+// como alternativa. Achado do critique (Fase 9): esta página precisa de
+// pelo menos um CTA, não pode ficar vazia.
 ---
 
 <BaseLayout title="Contato">
-	<h1>Contato</h1>
+	<div class="mx-auto max-w-2xl px-6 py-16">
+		<h1 class="text-carvao-900">Contato</h1>
+		<p class="mt-4 text-carvao-700">
+			Prefere falar direto com a gente? É rapidinho — respondemos por WhatsApp ou e-mail.
+		</p>
+
+		<div class="mt-8 flex flex-col gap-4 sm:flex-row">
+			<a
+				href={`https://wa.me/${NUMERO_WHATSAPP_PENDENTE}`}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="inline-flex items-center justify-center gap-2 rounded-full bg-dourado-500 px-6 py-3 text-sm font-semibold text-carvao-900 shadow-low transition-shadow hover:shadow-medium"
+			>
+				Chamar no WhatsApp
+			</a>
+
+			<span
+				class="inline-flex items-center justify-center gap-2 rounded-full border border-dashed border-carvao-300 px-6 py-3 text-sm font-medium text-carvao-700"
+			>
+				[E-MAIL_PENDENTE]
+			</span>
+		</div>
+	</div>
 </BaseLayout>

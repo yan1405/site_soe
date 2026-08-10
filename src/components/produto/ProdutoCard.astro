@@ -14,25 +14,49 @@ const { slug, nome, descricaoCurta, preco, disponivel, imagemSrc, imagemWidth, i
 	Astro.props;
 ---
 
-<li class="produto-card" data-slug={slug} data-nome={nome} data-preco={preco}>
-	<a href={`/produto/${slug}`}>
-		{
-			imagemSrc && (
-				<img src={imagemSrc} width={imagemWidth} height={imagemHeight} alt={nome} />
-			)
-		}
-		<p>{nome}</p>
-		<p>{descricaoCurta}</p>
-		<p>R$ {preco.toFixed(2)}</p>
+<li
+	class="produto-card group flex flex-col overflow-hidden rounded-xl bg-creme-50 shadow-low transition-shadow hover:shadow-medium"
+	data-slug={slug}
+	data-nome={nome}
+	data-preco={preco}
+>
+	<a href={`/produto/${slug}`} class="flex flex-1 flex-col">
+		<div class="aspect-square overflow-hidden bg-creme-300">
+			{
+				imagemSrc && (
+					<img
+						src={imagemSrc}
+						width={imagemWidth}
+						height={imagemHeight}
+						alt={nome}
+						loading="lazy"
+						class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+					/>
+				)
+			}
+		</div>
+		<div class="flex flex-1 flex-col gap-1 p-4">
+			<p class="font-heading text-lg font-semibold text-carvao-900">{nome}</p>
+			<p class="line-clamp-2 text-sm text-carvao-700">{descricaoCurta}</p>
+			<p class="mt-2 font-heading text-base font-semibold text-carvao-900">
+				R$ {preco.toFixed(2)}
+			</p>
+		</div>
 	</a>
 
-	<button type="button" class="adicionar-carrinho" disabled={!disponivel}>
-		{disponivel ? "Adicionar ao carrinho" : "Indisponível"}
-	</button>
+	<div class="p-4 pt-0">
+		<button
+			type="button"
+			class="adicionar-carrinho w-full rounded-full bg-dourado-500 px-4 py-2.5 text-sm font-semibold text-carvao-900 shadow-low transition-shadow hover:shadow-medium disabled:cursor-not-allowed disabled:bg-creme-300 disabled:text-carvao-500 disabled:shadow-none"
+			disabled={!disponivel}
+		>
+			{disponivel ? "Adicionar ao carrinho" : "Indisponível"}
+		</button>
+	</div>
 </li>
 
 <script>
-	import { adicionarItem } from "../../lib/cart-store.js";
+	import { adicionarItem } from "../../lib/cart-store";
 
 	document.querySelectorAll(".adicionar-carrinho").forEach((botao) => {
 		botao.addEventListener("click", () => {
@@ -43,6 +67,16 @@ const { slug, nome, descricaoCurta, preco, disponivel, imagemSrc, imagemWidth, i
 			if (!slug || !nome || !preco) return;
 
 			adicionarItem(slug, nome, Number(preco), 1);
+
+			if (botao instanceof HTMLButtonElement) {
+				const textoOriginal = botao.textContent;
+				botao.textContent = "Adicionado!";
+				botao.disabled = true;
+				setTimeout(() => {
+					botao.textContent = textoOriginal;
+					botao.disabled = false;
+				}, 1200);
+			}
 		});
 	});
 </script>

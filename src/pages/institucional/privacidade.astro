@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config.js";
+import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
 
 // Rascunho estruturado (LGPD, Lei 13.709/2018) — NÃO é aconselhamento
 // jurídico, precisa de revisão por advogado antes de produção. Ver CLAUDE.md,
@@ -9,6 +9,7 @@ const ultimaAtualizacao = "9 de agosto de 2026";
 ---
 
 <BaseLayout title="Política de Privacidade">
+	<div class="mx-auto max-w-3xl px-6 py-16 medida-leitura">
 	<h1>Política de Privacidade</h1>
 	<p>Última atualização: {ultimaAtualizacao}</p>
 
@@ -88,4 +89,5 @@ const ultimaAtualizacao = "9 de agosto de 2026";
 		Dúvidas sobre esta Política ou sobre o tratamento de seus dados podem ser enviadas
 		para [E-MAIL_PENDENTE] ou pelo WhatsApp {NUMERO_WHATSAPP_PENDENTE}.
 	</p>
+	</div>
 </BaseLayout>

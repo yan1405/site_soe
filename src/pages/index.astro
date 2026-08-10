@@ -26,9 +26,10 @@ function resolverImagem(nomeArquivo: string) {
 	<VitrineVideos />
 
 	<!-- Seção 3: Carros-chefe -->
-	<section>
-		<h2>Carros-chefe</h2>
-		<ul>
+	<section class="mx-auto max-w-6xl px-6 py-16">
+		<h2 class="text-carvao-900">Carros-chefe</h2>
+		<p class="mt-2 max-w-xl text-carvao-700">Os favoritos do ateliê — feitos à mão, em pequenos lotes.</p>
+		<ul class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{
 				carrosChefe.map((produto) => {
 					const imagem = resolverImagem(produto.data.imagens[0]);
