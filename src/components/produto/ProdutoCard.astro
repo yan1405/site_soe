@@ -1,4 +1,6 @@
 ---
+import { formatarPreco } from "../../lib/format";
+
 interface Props {
 	slug: string;
 	nome: string;
@@ -39,7 +41,7 @@ const { slug, nome, descricaoCurta, preco, disponivel, imagemSrc, imagemWidth, i
 			<p class="font-heading text-lg font-semibold text-carvao-900">{nome}</p>
 			<p class="line-clamp-2 text-sm text-carvao-700">{descricaoCurta}</p>
 			<p class="mt-2 font-heading text-base font-semibold text-carvao-900">
-				R$ {preco.toFixed(2)}
+				{formatarPreco(preco)}
 			</p>
 		</div>
 	</a>

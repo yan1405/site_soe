@@ -1,5 +1,6 @@
 // Estado do carrinho, 100% client-side, em localStorage — sem backend/banco.
 // Ver CLAUDE.md, seção "Arquitetura confirmada".
+import { formatarPreco } from "./format";
 
 export interface ItemCarrinho {
 	slug: string;
@@ -59,7 +60,7 @@ export function gerarMensagemWhatsApp(): string {
 
 	const linhas = itens.map(
 		(item) =>
-			`${item.quantidade}x ${item.nome} — R$ ${(item.preco * item.quantidade).toFixed(2)}`,
+			`${item.quantidade}x ${item.nome} — ${formatarPreco(item.preco * item.quantidade)}`,
 	);
 	const total = itens.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
 
@@ -68,6 +69,6 @@ export function gerarMensagemWhatsApp(): string {
 		"",
 		...linhas,
 		"",
-		`Total: R$ ${total.toFixed(2)}`,
+		`Total: ${formatarPreco(total)}`,
 	].join("\n");
 }

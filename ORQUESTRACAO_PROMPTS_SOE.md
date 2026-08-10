@@ -215,6 +215,8 @@ Antes de escrever em PROGRESS.md: confirme explicitamente, por nome, que usou a 
 
 ## Fase 6 — Hero com produto em 3D
 
+**Resultado revertido na Fase 9.6 (2026-08-10).** O Hero 3D descrito abaixo foi implementado como planejado, mas o `/impeccable critique` da Fase 9 achou que o canvas cobria a foto do produto (achado P1); a Fase 9.5 reposicionou o canvas para um medalhão menor, sem cobrir mais a foto; a Fase 9.6 removeu o canvas Three.js por completo, por decisão do Yan — o próprio `design-dna.json` da Fase 3 já definia `focal_strategy: "single hero element"` e `negative_space_role: "protagonista"`, e mesmo um medalhão pequeno contrariava os dois. O Hero hoje (pós-9.6) é só a imagem estática do produto, sozinha. A dependência `three`/`@types/three` foi removida do `package.json`. O prompt original desta fase fica preservado abaixo como registro histórico, não como estado atual do projeto.
+
 Depende da Fase 1, Fase 3 e da skill `threejs-skills`.
 
 ```

@@ -23,13 +23,13 @@ A formalização definitiva desses tokens em JSON acontece na Fase 3 (skill `des
 
 ## Arquitetura confirmada
 
-- **Stack:** Astro + TypeScript strict + Tailwind + GSAP/ScrollTrigger + Lenis (smooth scroll) + Three.js + Decap CMS + Netlify.
+- **Stack:** Astro + TypeScript strict + Tailwind + GSAP/ScrollTrigger + Lenis (smooth scroll) + Decap CMS + Netlify. ~~Three.js~~ removido na Fase 9.6 (ver linha "Hero 3D" abaixo) — não faz mais parte do stack.
 - **Content Collection** `src/content/produtos/`, schema: `slug`, `nome`, `descricaoCurta`, `preco` (number, valor exato, nunca arredondar), `imagens` (array), `destaqueHome` (boolean), `disponivel` (boolean, controlado pela cliente via Decap CMS).
 - **Rotas:** `/`, `/catalogo`, `/produto/[slug]`, `/carrinho`, `/nossa-historia`, `/institucional/privacidade`, `/institucional/termos`, `/institucional/trocas-devolucoes`, `/institucional/contato`.
 - **Carrinho:** 100% client-side, `localStorage`, sem backend/banco. O checkout consolida os itens numa única mensagem de WhatsApp — **não processa pagamento** até o gateway ser escolhido pela cliente. Quando o gateway existir, o mesmo botão passa a levar a um checkout real, sem reescrever a estrutura do carrinho.
-- **Hero 3D:** a imagem estática do produto é o elemento de LCP e carrega primeiro; o canvas Three.js entra depois, via `client:idle` ou `client:visible` — nunca `client:load`. Isso é requisito de performance não negociável.
+- **Hero 3D: ABANDONADO (Fase 9.6, 2026-08-10, decisão do Yan).** O canvas Three.js foi implementado na Fase 6, reposicionado na Fase 9.5 (o critique tinha achado que ele cobria a foto do produto) e removido por completo na Fase 9.6 — não é retomar experimentação, é alinhar com o que o próprio `design-dna.json` (Fase 3, extraído das fotos reais) já documentava: `visual_language.focal_strategy: "single hero element"` e `composition.negative_space_role: "protagonista"`. Um segundo elemento visual (mesmo só um medalhão pequeno) contrariava os dois. O Hero hoje é só a imagem estática do produto, sozinha — continua sendo o elemento de LCP, carrega primeiro, sem nenhum canvas depois. Ver PROGRESS.md, seção Fase 9.6, para o histórico completo.
 - **Vitrine de vídeos:** GSAP/ScrollTrigger, revelação progressiva no scroll, **sem CTA** — é ilustração visual pura, não elemento de conversão.
-- **Acessibilidade:** toda animação respeita `prefers-reduced-motion`; `aria-label` na cena 3D; alt text em imagens/vídeos; contraste WCAG AA na paleta creme/dourado.
+- **Acessibilidade:** toda animação respeita `prefers-reduced-motion`; alt text em imagens/vídeos; contraste WCAG AA na paleta creme/dourado. (O requisito de `aria-label` na cena 3D não se aplica mais — não existe mais cena 3D, ver "Hero 3D" acima.)
 - **Analytics:** GA4/Meta Pixel só disparam depois do consentimento no banner de cookies — nunca automático no carregamento.
 
 ## Skills/plugins instalados em `.claude/` (fora de `src/`)
@@ -39,7 +39,7 @@ A formalização definitiva desses tokens em JSON acontece na Fase 3 (skill `des
 | `impeccable` | Auditoria de design — usar em `/impeccable audit` e `/impeccable critique` |
 | `gsap-skills` (sub-skill `gsap-scrolltrigger`) | Vitrine de vídeos |
 | `design-dna` | Gera tokens de cor/tipografia/espaçamento a partir das fotos reais |
-| `threejs-skills` | Hero 3D — módulos fundamentals, lighting, performance |
+| `threejs-skills` | Hero 3D — usado na Fase 6; **Hero 3D abandonado na Fase 9.6** (ver "Arquitetura confirmada"), skill não tem mais uso ativo no projeto |
 | `ponytail` | Disciplina de código mínimo — aplicar em toda implementação, não só no carrinho |
 | `strix` | Segurança — **NÃO rodar durante o desenvolvimento**, só pré-deploy e ao redor da integração do gateway de pagamento. Não é skill modular, é CLI própria (`curl -sSL https://strix.ai/install \| bash`). |
 

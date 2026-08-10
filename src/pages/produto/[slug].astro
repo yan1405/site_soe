@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
+import { formatarPreco } from "../../lib/format";
 
 export async function getStaticPaths() {
 	const produtos = await getCollection("produtos");
@@ -52,7 +53,7 @@ const mensagemWhatsApp = encodeURIComponent(
 		<div class="flex flex-col gap-4">
 			<h1 class="text-carvao-900">{produto.data.nome}</h1>
 			<p class="font-heading text-2xl font-semibold text-carvao-900">
-				R$ {produto.data.preco.toFixed(2)}
+				{formatarPreco(produto.data.preco)}
 			</p>
 			<p class="text-carvao-700">{produto.data.descricaoCurta}</p>
 			<p class="text-sm font-medium text-oliva-700">

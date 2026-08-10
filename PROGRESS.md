@@ -1092,3 +1092,67 @@ Copy com voz de marca, fotografia como âncora de especificidade, checkout Whats
 Ver mensagem de commit desta sessão para a lista literal de arquivos alterados.
 
 Fase 9.5 concluída. **Não iniciei a Fase 10** — aguardando sua revisão dos números de antes/depois acima, como pedido.
+
+**Nota (2026-08-10):** ao preparar o commit da Fase 9.5, encontrei `DIAGNOSTICO_DESIGN_2026-08-10.md`, `design-dna-atelieno-referencia.json` e `identidade-visual/` no projeto — arquivos que eu não criei nesta sessão. O usuário confirmou que vieram de outra sessão dele (Cowork) rodando em paralelo na mesma pasta (pesquisa de design + vetorização de logo), não fazem parte do escopo da Fase 9.5, e não devem entrar no commit. Ficaram fora, confirmado por `git status` antes e depois do commit `52705df`.
+
+---
+
+## Fase 9.6 — Remoção do Hero 3D + correção de formatação de moeda (2026-08-10)
+
+### Item 1 — Hero 3D removido por completo (decisão do Yan)
+
+`src/components/home/Hero.astro`: apagados o `<canvas id="hero-canvas-3d">`, o bloco `<style>` inteiro (as regras eram só para posicionar/animar o canvas — sem ele, `.hero-produto` não precisa de `position: relative` nem de nada mais) e o `<script>` inteiro (import de `three`, Scene/Camera/Renderer/Torus/animação/cleanup). O que sobrou: só a imagem estática do produto, sozinha — continua sendo o elemento de LCP (`fetchpriority="high"`, `loading="eager"`, `decoding="sync"`), sem nenhum canvas depois.
+
+**Justificativa registrada, não é retomar experimentação**: o próprio `design-dna.json` da SOE (Fase 3, extraído das 7 fotos reais) já definia `visual_language.focal_strategy: "single hero element"` e `composition.negative_space_role: "protagonista"` — o torus (mesmo já reposicionado como medalhão menor na Fase 9.5) contrariava os dois, um segundo elemento visual competindo com a foto.
+
+**Dependência removida**: confirmei via `grep -rln "from \"three\"" src/` que `Hero.astro` era o único consumidor. Rodei `npm uninstall three @types/three` (remove de `package.json` e atualiza `package-lock.json` no mesmo passo, mais confiável que editar à mão + `npm install` separado). Confirmado: `node_modules/three` não existe mais, `package.json` não lista mais nenhum dos dois.
+
+**Verificação real, não só alegação:**
+```
+npm run build → 14 páginas, sem erro
+ls dist/_astro/ | grep -i three → vazio (o chunk de 517KB da Fase 6 sumiu do build)
+grep -c "hero-canvas" dist/index.html → 0
+```
+
+### Referências desatualizadas corrigidas
+
+- `CLAUDE.md`, "Arquitetura confirmada": linha "Hero 3D" marcada como **ABANDONADO (Fase 9.6, 2026-08-10)**, com o motivo completo; linha do stack não lista mais Three.js; linha de acessibilidade não menciona mais `aria-label` na cena 3D (não existe mais cena). Tabela de skills: `threejs-skills` marcada como sem uso ativo.
+- `src/styles/design-dna.json`, campo `visual_effects.3d_elements.description`: atualizado registrando que o requisito de arquitetura foi implementado na Fase 6 e removido na Fase 9.6 — JSON confirmado válido depois da edição (`node -e "JSON.parse(...)"`).
+- `ORQUESTRACAO_PROMPTS_SOE.md`, Fase 6: nota no topo da seção explicando que o resultado foi revertido na Fase 9.6, com o prompt original preservado abaixo como registro histórico, não como estado atual.
+
+### Item 2 — Formatação de moeda corrigida em todo o site
+
+Todas as 8 ocorrências de `preco.toFixed(2)` (que produziam `R$ 34.90`, formato errado) trocadas por um helper único, `src/lib/format.ts`:
+
+```ts
+export function formatarPreco(valor: number): string {
+	return new Intl.NumberFormat("pt-BR", {
+		style: "currency",
+		currency: "BRL",
+	}).format(valor);
+}
+```
+
+Locais corrigidos: `ProdutoCard.astro`, `produto/[slug].astro`, `CartDrawer.astro` (2 ocorrências), `carrinho.astro` (2 ocorrências), `cart-store.ts` (2 ocorrências, dentro de `gerarMensagemWhatsApp` — a mensagem que vai pro WhatsApp também corrige o formato). `Intl.NumberFormat` já inclui o "R$" — não concatenei de novo.
+
+**Verificação real**: `grep -rn "toFixed(2)" src/` retorna só a menção no comentário do próprio `format.ts` — as 8 ocorrências reais confirmadas corrigidas. No HTML gerado (`dist/produto/animal-print/index.html`), `cat -A` confirma `R$` seguido de espaço não-quebrável (padrão do `Intl.NumberFormat`, não um bug) e vírgula decimal: `R$M-BM- 34,90` (a sequência `M-BM- ` é como o `cat -A` representa o byte UTF-8 do espaço não-quebrável U+00A0).
+
+### Verificação final
+
+```
+npm run build → 14 páginas, sem erro
+astro check → Result (27 files): 0 errors, 0 warnings, 9 hints
+```
+
+(27 arquivos, não mais 26 — `format.ts` é novo. O único "warning" que aparece no texto bruto, `z` deprecated do Zod, é de biblioteca de terceiro, não do código do projeto — o sumário do comando já conta como hint/0 warning.)
+
+### Screenshots reais — `PROGRESS_screenshots/fase-9.6/`
+
+Capturados via `astro preview` (produção real, não dev server):
+- `01-hero-sem-medalhao-3d.jpg` — Hero só com a foto, nenhum vestígio de canvas/medalhão em nenhum canto da imagem.
+- `02-catalogo-precos-com-virgula.jpg` — 3 cards do catálogo, preços `R$ 34,90`/`R$ 42,90`/`R$ 39,90`.
+- `03-produto-preco-com-virgula.jpg` — página de produto, `R$ 39,90`.
+- `04-drawer-carrinho-preco-com-virgula.jpg` — drawer aberto com item real no carrinho, item e total em vírgula.
+- `05-pagina-carrinho-preco-com-virgula.jpg` — rota `/carrinho` standalone, mesmo item, item e total em vírgula.
+
+Fase 9.6 concluída. **Não commitei ainda** e **não iniciei a Fase 10** — aguardando você revisar os screenshots, como combinado.
