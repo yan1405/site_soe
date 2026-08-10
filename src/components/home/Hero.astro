@@ -1,0 +1,192 @@
+---
+// Hero da home: imagem estática do produto (LCP) + canvas 3D por cima,
+// hidratado só depois — ver CLAUDE.md, "Arquitetura confirmada" (requisito
+// NÃO NEGOCIÁVEL de performance).
+import { getCollection } from "astro:content";
+
+const produtos = await getCollection("produtos");
+const produtoHero = produtos.find((p) => p.data.destaqueHome) ?? produtos[0];
+
+const imagensDisponiveis = import.meta.glob<{ default: ImageMetadata }>(
+	"/src/assets/produtos/*",
+	{ eager: true },
+);
+const imagemHero = produtoHero
+	? imagensDisponiveis[`/src/assets/produtos/${produtoHero.data.imagens[0]}`]?.default
+	: undefined;
+---
+
+<section class="hero" aria-label="Produto em destaque">
+	<div class="hero-copy">
+		<p class="hero-tagline">Feito à mão, com carinho de ateliê</p>
+		<h1>SOE Acessórios</h1>
+		<p>Acessórios de cabelo artesanais para quem faz questão do detalhe.</p>
+	</div>
+
+	<div class="hero-produto">
+		{
+			imagemHero && (
+				<img
+					id="hero-imagem-estatica"
+					src={imagemHero.src}
+					width={imagemHero.width}
+					height={imagemHero.height}
+					alt={produtoHero?.data.nome ?? "Produto SOE Acessórios"}
+					fetchpriority="high"
+					loading="eager"
+					decoding="sync"
+				/>
+			)
+		}
+		<canvas
+			id="hero-canvas-3d"
+			role="img"
+			aria-label={`Modelo 3D em rotação, ilustrando ${produtoHero?.data.nome ?? "um produto"} da SOE Acessórios`}
+		></canvas>
+	</div>
+</section>
+
+<style>
+	.hero-produto {
+		position: relative;
+		display: inline-block;
+	}
+
+	#hero-imagem-estatica {
+		display: block;
+		max-width: 100%;
+		height: auto;
+	}
+
+	/* O canvas entra POR CIMA da imagem estática, só depois de renderizar o
+	   primeiro frame — nunca antes, nunca bloqueando a imagem (o LCP). */
+	#hero-canvas-3d {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		opacity: 0;
+		transition: opacity 0.6s ease-out;
+	}
+
+	#hero-canvas-3d.hero-canvas-pronto {
+		opacity: 1;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		#hero-canvas-3d {
+			transition: none;
+		}
+	}
+</style>
+
+<script>
+	// A imagem estática acima já é HTML puro, sem <script> nenhum — ela carrega
+	// e pinta (LCP) independente deste bloco. O que segue só existe para atrasar
+	// o canvas 3D até depois disso.
+	//
+	// Este projeto não tem nenhuma integração de UI framework (React/Vue/Svelte)
+	// instalada — as diretivas client:idle/client:visible do Astro só existem
+	// para "islands" desses frameworks, então não se aplicam literalmente a um
+	// <script> solto num .astro puro. O equivalente funcional implementado à
+	// mão: esperar o navegador ficar ocioso (requestIdleCallback, com fallback
+	// setTimeout para Safari, que não suporta a API) antes de sequer importar o
+	// Three.js — o import dinâmico cai num chunk separado do bundle principal,
+	// então nem o download nem a execução competem com a pintura da imagem.
+	function iniciarCena3D() {
+		import("three").then((THREE) => {
+			const canvas = document.getElementById("hero-canvas-3d");
+			if (!(canvas instanceof HTMLCanvasElement)) return;
+
+			const prefersReducedMotion = window.matchMedia(
+				"(prefers-reduced-motion: reduce)",
+			).matches;
+
+			// threejs-fundamentals: Scene / PerspectiveCamera / WebGLRenderer.
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+			camera.position.set(0, 0, 4.5);
+
+			const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+			// threejs-fundamentals, "Performance Tips": cap o pixel ratio (evita
+			// renderizar em resolução desnecessária em telas retina/4K).
+			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+			function redimensionar() {
+				const { clientWidth, clientHeight } = canvas;
+				if (clientWidth === 0 || clientHeight === 0) return;
+				camera.aspect = clientWidth / clientHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize(clientWidth, clientHeight, false);
+			}
+			redimensionar();
+			window.addEventListener("resize", redimensionar);
+
+			// threejs-lighting, "Three-Point Lighting": luz-chave quente +
+			// preenchimento + ambiente, coerente com o design-dna.json ("luz
+			// solar lateral/natural com sombra suave difusa").
+			const luzChave = new THREE.DirectionalLight(0xffe3b3, 1.4); // tom dourado quente
+			luzChave.position.set(3, 4, 5);
+			scene.add(luzChave);
+
+			const luzPreenchimento = new THREE.DirectionalLight(0xffffff, 0.4);
+			luzPreenchimento.position.set(-4, 2, 2);
+			scene.add(luzPreenchimento);
+
+			const ambiente = new THREE.AmbientLight(0xfff3df, 0.5);
+			scene.add(ambiente);
+
+			// Geometria simples só para validar a integração — trocar por
+			// asset real (GLTF do laço) depois, como o prompt da Fase 6 pede.
+			// TorusGeometry (não TorusKnot) por ser leve o bastante para não
+			// competir com o carrinho/vitrine de vídeos já rodando na página.
+			const geometria = new THREE.TorusGeometry(1, 0.35, 32, 64);
+			const material = new THREE.MeshStandardMaterial({
+				color: 0xbc9a4e, // dourado do tailwind.config.mjs (Fase 3)
+				roughness: 0.4,
+				metalness: 0.15,
+			});
+			const produtoHero3D = new THREE.Mesh(geometria, material);
+			produtoHero3D.rotation.x = Math.PI / 5;
+			scene.add(produtoHero3D);
+
+			const relogio = new THREE.Clock();
+			let quadroAtivo = true;
+
+			function animar() {
+				if (!quadroAtivo) return;
+				requestAnimationFrame(animar);
+				if (!prefersReducedMotion) {
+					const delta = relogio.getDelta();
+					produtoHero3D.rotation.z += delta * 0.4;
+				}
+				renderer.render(scene, camera);
+			}
+			animar();
+
+			// Só revela o canvas por cima da imagem estática depois do
+			// primeiro frame renderizado — a imagem já pintou bem antes disso.
+			canvas.classList.add("hero-canvas-pronto");
+
+			// threejs-fundamentals, "Common Patterns" -> Proper Cleanup: libera
+			// geometria/material/renderer se o usuário sair da página.
+			window.addEventListener(
+				"pagehide",
+				() => {
+					quadroAtivo = false;
+					window.removeEventListener("resize", redimensionar);
+					geometria.dispose();
+					material.dispose();
+					renderer.dispose();
+				},
+				{ once: true },
+			);
+		});
+	}
+
+	if ("requestIdleCallback" in window) {
+		requestIdleCallback(iniciarCena3D);
+	} else {
+		setTimeout(iniciarCena3D, 200);
+	}
+</script>

@@ -1,7 +1,91 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config.js";
+
+// Rascunho estruturado (LGPD, Lei 13.709/2018) — NÃO é aconselhamento
+// jurídico, precisa de revisão por advogado antes de produção. Ver CLAUDE.md,
+// "Aviso sobre o conteúdo jurídico".
+const ultimaAtualizacao = "9 de agosto de 2026";
 ---
 
 <BaseLayout title="Política de Privacidade">
 	<h1>Política de Privacidade</h1>
+	<p>Última atualização: {ultimaAtualizacao}</p>
+
+	<p>
+		A SOE Acessórios, [CNPJ/MEI — PENDENTE], leva a sério a privacidade de quem visita e
+		compra em nosso site. Esta Política explica quais dados coletamos, para que usamos e
+		quais direitos você tem sobre eles, em conformidade com a Lei Geral de Proteção de
+		Dados (Lei nº 13.709/2018 — LGPD).
+	</p>
+
+	<h2>1. Dados que coletamos</h2>
+	<p>
+		Dados de identificação e contato fornecidos voluntariamente (nome, e-mail,
+		telefone/WhatsApp) quando você entra em contato, adiciona itens ao carrinho ou
+		preenche o formulário de contato. Dados de navegação (páginas visitadas, tempo de
+		permanência, dispositivo, origem do acesso), coletados por cookies e ferramentas de
+		análise, somente após seu consentimento no banner de cookies. Não coletamos dados de
+		pagamento diretamente no site — a finalização da compra ocorre via WhatsApp, fora
+		desta plataforma.
+	</p>
+
+	<h2>2. Finalidade do tratamento</h2>
+	<p>
+		Responder contatos e dúvidas; processar e conduzir pedidos de compra iniciados pelo
+		carrinho do site; melhorar a experiência de navegação e o desempenho do site; cumprir
+		obrigações legais e regulatórias.
+	</p>
+
+	<h2>3. Base legal</h2>
+	<p>
+		O tratamento de dados pessoais neste site se baseia em: consentimento do titular, para
+		cookies não essenciais e comunicações de marketing; execução de procedimentos
+		preliminares relacionados a contrato, para o processamento de pedidos; cumprimento de
+		obrigação legal, quando aplicável.
+	</p>
+
+	<h2>4. Compartilhamento de dados</h2>
+	<p>
+		Não vendemos dados pessoais. Podemos compartilhar dados com prestadores de serviço
+		estritamente necessários à operação do site (ex.: hospedagem, ferramentas de análise
+		de tráfego), sempre limitados ao necessário para a finalidade do serviço.
+	</p>
+
+	<h2>5. Seus direitos como titular</h2>
+	<p>
+		Nos termos da LGPD, você pode solicitar a qualquer momento: confirmação da existência
+		de tratamento, acesso aos dados, correção de dados incompletos ou desatualizados,
+		anonimização/bloqueio/eliminação de dados desnecessários, portabilidade, informação
+		sobre compartilhamento, e revogação do consentimento. Para exercer esses direitos,
+		entre em contato pelo e-mail [E-MAIL_PENDENTE] ou pelo WhatsApp indicado no rodapé.
+	</p>
+
+	<h2>6. Cookies</h2>
+	<p>
+		Este site usa cookies. Cookies estritamente necessários ao funcionamento do site são
+		carregados automaticamente; cookies de análise e marketing só são ativados após seu
+		consentimento explícito no banner de cookies, que permite aceitar todos, rejeitar não
+		essenciais, ou configurar por categoria.
+	</p>
+
+	<h2>7. Segurança dos dados</h2>
+	<p>
+		Adotamos medidas técnicas e administrativas razoáveis para proteger os dados pessoais
+		tratados neste site contra acessos não autorizados e situações de destruição, perda,
+		alteração ou vazamento.
+	</p>
+
+	<h2>8. Alterações desta política</h2>
+	<p>
+		Esta política pode ser atualizada para refletir mudanças em nossas práticas ou na
+		legislação aplicável. A data da última atualização estará sempre indicada no topo
+		desta página.
+	</p>
+
+	<h2>9. Contato</h2>
+	<p>
+		Dúvidas sobre esta Política ou sobre o tratamento de seus dados podem ser enviadas
+		para [E-MAIL_PENDENTE] ou pelo WhatsApp {NUMERO_WHATSAPP_PENDENTE}.
+	</p>
 </BaseLayout>

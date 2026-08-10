@@ -1,0 +1,35 @@
+---
+---
+
+<button
+	id="cart-icon-toggle"
+	type="button"
+	aria-label="Abrir carrinho"
+	aria-controls="cart-drawer"
+	aria-expanded="false"
+>
+	<span aria-hidden="true">🛍️</span>
+	<span id="cart-count">0</span>
+</button>
+
+<script>
+	import { listarItens } from "../../lib/cart-store.js";
+
+	const botao = document.getElementById("cart-icon-toggle");
+	const contador = document.getElementById("cart-count");
+
+	function atualizarContador() {
+		if (!contador) return;
+		const total = listarItens().reduce((soma, item) => soma + item.quantidade, 0);
+		contador.textContent = String(total);
+	}
+
+	botao?.addEventListener("click", () => {
+		const drawer = document.getElementById("cart-drawer");
+		const aberto = drawer?.toggleAttribute("hidden") === false;
+		botao.setAttribute("aria-expanded", String(aberto));
+	});
+
+	window.addEventListener("soe-carrinho-atualizado", atualizarContador);
+	atualizarContador();
+</script>

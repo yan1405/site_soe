@@ -1,0 +1,86 @@
+---
+---
+
+<div id="cookie-banner" role="dialog" aria-live="polite" aria-label="Aviso de cookies" hidden>
+	<p><strong>Usamos cookies</strong></p>
+	<p>
+		Usamos cookies para melhorar sua experiência neste site. Cookies essenciais ao
+		funcionamento estão sempre ativos; os demais só são usados com sua permissão.
+	</p>
+
+	<div class="cookie-banner-acoes">
+		<button id="cookie-aceitar-todos" type="button">Aceitar todos</button>
+		<button id="cookie-rejeitar" type="button">Rejeitar não essenciais</button>
+		<button id="cookie-personalizar" type="button" aria-controls="cookie-painel" aria-expanded="false">
+			Personalizar
+		</button>
+	</div>
+
+	<form id="cookie-painel" hidden>
+		<fieldset>
+			<legend>Personalizar cookies</legend>
+
+			<label>
+				<input type="checkbox" checked disabled />
+				Essenciais (sempre ativo)
+			</label>
+
+			<label>
+				<input type="checkbox" id="cookie-cat-analise" />
+				Análise/Desempenho
+			</label>
+
+			<label>
+				<input type="checkbox" id="cookie-cat-marketing" />
+				Marketing
+			</label>
+		</fieldset>
+
+		<button id="cookie-salvar-preferencias" type="submit">Salvar preferências</button>
+	</form>
+</div>
+
+<script>
+	import { lerConsentimento, salvarConsentimento } from "../../lib/consent.js";
+
+	const banner = document.getElementById("cookie-banner");
+	const painel = document.getElementById("cookie-painel");
+	const botaoPersonalizar = document.getElementById("cookie-personalizar");
+	const checkboxAnalise = document.getElementById("cookie-cat-analise");
+	const checkboxMarketing = document.getElementById("cookie-cat-marketing");
+
+	// Só mostra o banner se ainda não houver decisão salva.
+	if (banner && !lerConsentimento()) {
+		banner.hidden = false;
+	}
+
+	function fecharBanner() {
+		if (banner) banner.hidden = true;
+	}
+
+	document.getElementById("cookie-aceitar-todos")?.addEventListener("click", () => {
+		salvarConsentimento({ analise: true, marketing: true });
+		fecharBanner();
+	});
+
+	document.getElementById("cookie-rejeitar")?.addEventListener("click", () => {
+		salvarConsentimento({ analise: false, marketing: false });
+		fecharBanner();
+	});
+
+	botaoPersonalizar?.addEventListener("click", () => {
+		if (!(painel instanceof HTMLElement)) return;
+		const abrindo = painel.hidden;
+		painel.hidden = !abrindo;
+		botaoPersonalizar.setAttribute("aria-expanded", String(abrindo));
+	});
+
+	painel?.addEventListener("submit", (evento) => {
+		evento.preventDefault();
+		salvarConsentimento({
+			analise: checkboxAnalise instanceof HTMLInputElement && checkboxAnalise.checked,
+			marketing: checkboxMarketing instanceof HTMLInputElement && checkboxMarketing.checked,
+		});
+		fecharBanner();
+	});
+</script>

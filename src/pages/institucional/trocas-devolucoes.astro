@@ -1,7 +1,54 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config.js";
+
+// Rascunho estruturado (CDC art. 49, Decreto 7.962/2013) — NÃO é
+// aconselhamento jurídico, precisa de revisão por advogado antes de
+// produção. Ver CLAUDE.md, "Aviso sobre o conteúdo jurídico".
 ---
 
 <BaseLayout title="Trocas e Devoluções">
-	<h1>Trocas e Devoluções</h1>
+	<h1>Trocas, Devoluções e Direito de Arrependimento</h1>
+
+	<h2>1. Direito de arrependimento</h2>
+	<p>
+		Nos termos do art. 49 do Código de Defesa do Consumidor (Lei nº 8.078/1990), você tem
+		o direito de desistir da compra em até 7 (sete) dias corridos, contados da data de
+		recebimento do produto, sem necessidade de justificar o motivo — por se tratar de
+		compra realizada fora do estabelecimento comercial físico.
+	</p>
+
+	<h2>2. Como solicitar</h2>
+	<p>
+		Entre em contato pelo WhatsApp {NUMERO_WHATSAPP_PENDENTE} ou pelo e-mail
+		[E-MAIL_PENDENTE] dentro do prazo de 7 dias corridos, informando o pedido e o motivo
+		da desistência (opcional).
+	</p>
+
+	<h2>3. Condições do produto para devolução</h2>
+	<p>
+		O produto deve ser devolvido em sua embalagem original, sem sinais de uso,
+		acompanhado da nota/comprovante de compra.
+	</p>
+
+	<h2>4. Reembolso</h2>
+	<p>
+		Confirmada a devolução dentro do prazo e condições acima, o reembolso será integral,
+		incluindo o valor do frete de envio original, sem qualquer ônus para você. O
+		reembolso é processado pelo mesmo meio de pagamento utilizado na compra, em até
+		[PRAZO_PENDENTE] dias úteis após o recebimento do produto devolvido.
+	</p>
+
+	<h2>5. Trocas por defeito ou vício</h2>
+	<p>
+		Produtos com defeito de fabricação podem ser trocados ou reembolsados conforme os
+		prazos e condições do Código de Defesa do Consumidor (art. 18 e seguintes),
+		independentemente do prazo de arrependimento acima.
+	</p>
+
+	<h2>6. Frete de devolução</h2>
+	<p>
+		Nas devoluções por direito de arrependimento, o custo do frete de devolução é de
+		responsabilidade da SOE Acessórios.
+	</p>
 </BaseLayout>

@@ -1,0 +1,69 @@
+---
+import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config.js";
+---
+
+<aside
+	id="cart-drawer"
+	hidden
+	aria-label="Carrinho de compras"
+	data-whatsapp={NUMERO_WHATSAPP_PENDENTE}
+>
+	<button id="cart-drawer-fechar" type="button" aria-label="Fechar carrinho">Fechar</button>
+	<h2>Seu carrinho</h2>
+
+	<ul id="cart-drawer-itens"></ul>
+	<p id="cart-drawer-total"></p>
+
+	<a id="cart-drawer-whatsapp" href="#" target="_blank" rel="noopener noreferrer">
+		Finalizar no WhatsApp
+	</a>
+</aside>
+
+<script>
+	import { listarItens, removerItem, gerarMensagemWhatsApp } from "../../lib/cart-store.js";
+
+	const drawer = document.getElementById("cart-drawer");
+	const lista = document.getElementById("cart-drawer-itens");
+	const totalEl = document.getElementById("cart-drawer-total");
+	const linkWhatsApp = document.getElementById("cart-drawer-whatsapp");
+
+	function renderizar() {
+		if (!drawer || !lista || !totalEl || !linkWhatsApp) return;
+
+		const itens = listarItens();
+		lista.innerHTML = "";
+
+		if (itens.length === 0) {
+			const vazio = document.createElement("li");
+			vazio.textContent = "Seu carrinho está vazio.";
+			lista.append(vazio);
+		}
+
+		for (const item of itens) {
+			const li = document.createElement("li");
+			li.textContent = `${item.quantidade}x ${item.nome} — R$ ${(item.preco * item.quantidade).toFixed(2)} `;
+
+			const botaoRemover = document.createElement("button");
+			botaoRemover.type = "button";
+			botaoRemover.textContent = "Remover";
+			botaoRemover.addEventListener("click", () => removerItem(item.slug));
+
+			li.append(botaoRemover);
+			lista.append(li);
+		}
+
+		const total = itens.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
+		totalEl.textContent = `Total: R$ ${total.toFixed(2)}`;
+
+		const numero = drawer.dataset.whatsapp;
+		const mensagem = encodeURIComponent(gerarMensagemWhatsApp());
+		linkWhatsApp.setAttribute("href", `https://wa.me/${numero}?text=${mensagem}`);
+	}
+
+	document.getElementById("cart-drawer-fechar")?.addEventListener("click", () => {
+		drawer?.setAttribute("hidden", "");
+	});
+
+	window.addEventListener("soe-carrinho-atualizado", renderizar);
+	renderizar();
+</script>

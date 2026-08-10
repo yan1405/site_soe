@@ -1,0 +1,28 @@
+---
+import CartIcon from "./CartIcon.astro";
+
+const links = [
+	{ href: "/", label: "Home" },
+	{ href: "/catalogo", label: "Catálogo" },
+	{ href: "/nossa-historia", label: "Nossa História" },
+	{ href: "/institucional/contato", label: "Contato" },
+];
+---
+
+<header>
+	<a href="/" class="logo">SOE Acessórios</a>
+
+	<nav aria-label="Navegação principal">
+		<ul>
+			{
+				links.map((link) => (
+					<li>
+						<a href={link.href}>{link.label}</a>
+					</li>
+				))
+			}
+		</ul>
+	</nav>
+
+	<CartIcon />
+</header>

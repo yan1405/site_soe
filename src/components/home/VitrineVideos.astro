@@ -1,0 +1,82 @@
+---
+// Vitrine de vídeos — ilustração visual pura, SEM CTA (ver CLAUDE.md,
+// "Arquitetura confirmada"). Arquivos finais da Fase 8 (public/videos/):
+// recorte 8–10s, CRF 26, H.264 único — ver PROGRESS.md, seção Fase 8, para
+// a tabela de antes/depois. Substituídos os placeholders brutos da Fase 5
+// (public/videos-raw/, removido).
+//
+// prova-social-scrunchies.mp4 (ex-Video_by_soefloripa.mp4) fica DE FORA da
+// vitrine principal de propósito — está em 360×640, abaixo do mínimo de
+// 720p que o ORQUESTRACAO_PROMPTS_SOE.md exige para vídeo "em destaque";
+// entra só na seção de prova social (ainda não construída) quando existir.
+const videos = [
+	{
+		src: "/videos/embalagem-artesanal.mp4",
+		aria: "Vídeo mostrando o processo de embalar laços à mão em caixinha de presente da SOE Acessórios",
+	},
+	{
+		src: "/videos/vitrine-experimente-tamanhos.mp4",
+		aria: "Vídeo mostrando os diferentes tamanhos de scrunchies da SOE Acessórios sendo usados no cabelo",
+	},
+	{
+		src: "/videos/vitrine-feira.mp4",
+		aria: "Vídeo mostrando a barraca da SOE Acessórios em uma feira, com os produtos expostos",
+	},
+];
+---
+
+<section class="vitrine-videos" aria-label="Vitrine de vídeos SOE Acessórios">
+	<ul>
+		{
+			videos.map((video) => (
+				<li>
+					<video
+						class="vitrine-video"
+						src={video.src}
+						muted
+						loop
+						playsinline
+						autoplay
+						preload="none"
+						aria-label={video.aria}
+					/>
+				</li>
+			))
+		}
+	</ul>
+</section>
+
+<script>
+	import { gsap } from "gsap";
+	import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+	gsap.registerPlugin(ScrollTrigger);
+
+	const videos = gsap.utils.toArray<HTMLElement>(".vitrine-video");
+	const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+	if (prefersReducedMotion) {
+		// Requisito não-negociável do CLAUDE.md: com a preferência ativada,
+		// os vídeos aparecem direto, sem animação de entrada.
+		gsap.set(videos, { opacity: 1, scale: 1, y: 0 });
+	} else {
+		gsap.set(videos, { opacity: 0, scale: 0.92, y: 24 });
+
+		// Padrão da sub-skill gsap-scrolltrigger para revelar vários elementos
+		// semelhantes ao entrarem no viewport: ScrollTrigger.batch(), com
+		// stagger no callback onEnter — alternativa recomendada a IntersectionObserver.
+		ScrollTrigger.batch(".vitrine-video", {
+			start: "top 80%", // mesmo trigger point do design-dna.json (viewport 80%)
+			once: true, // dispara uma vez ao entrar, não-scrubbed — ver design-dna.json
+			onEnter: (elementos) =>
+				gsap.to(elementos, {
+					opacity: 1,
+					scale: 1,
+					y: 0,
+					duration: 0.8,
+					ease: "power2.out",
+					stagger: 0.15,
+				}),
+		});
+	}
+</script>

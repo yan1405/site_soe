@@ -1,0 +1,48 @@
+---
+interface Props {
+	slug: string;
+	nome: string;
+	descricaoCurta: string;
+	preco: number;
+	disponivel: boolean;
+	imagemSrc?: string;
+	imagemWidth?: number;
+	imagemHeight?: number;
+}
+
+const { slug, nome, descricaoCurta, preco, disponivel, imagemSrc, imagemWidth, imagemHeight } =
+	Astro.props;
+---
+
+<li class="produto-card" data-slug={slug} data-nome={nome} data-preco={preco}>
+	<a href={`/produto/${slug}`}>
+		{
+			imagemSrc && (
+				<img src={imagemSrc} width={imagemWidth} height={imagemHeight} alt={nome} />
+			)
+		}
+		<p>{nome}</p>
+		<p>{descricaoCurta}</p>
+		<p>R$ {preco.toFixed(2)}</p>
+	</a>
+
+	<button type="button" class="adicionar-carrinho" disabled={!disponivel}>
+		{disponivel ? "Adicionar ao carrinho" : "Indisponível"}
+	</button>
+</li>
+
+<script>
+	import { adicionarItem } from "../../lib/cart-store.js";
+
+	document.querySelectorAll(".adicionar-carrinho").forEach((botao) => {
+		botao.addEventListener("click", () => {
+			const card = botao.closest(".produto-card");
+			if (!(card instanceof HTMLElement)) return;
+
+			const { slug, nome, preco } = card.dataset;
+			if (!slug || !nome || !preco) return;
+
+			adicionarItem(slug, nome, Number(preco), 1);
+		});
+	});
+</script>

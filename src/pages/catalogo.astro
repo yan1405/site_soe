@@ -1,11 +1,12 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ProdutoCard from "../components/produto/ProdutoCard.astro";
 
 const produtos = await getCollection("produtos");
 
 // Resolve os arquivos em src/assets/produtos/ referenciados pelo campo `imagens`
-// de cada entrada (ainda sem componente <Image />/estilização — Fase 2 é só dados).
+// de cada entrada (ainda sem estilização — Fase 2 é só dados).
 const imagensDisponiveis = import.meta.glob<{ default: ImageMetadata }>(
 	"/src/assets/produtos/*",
 	{ eager: true },
@@ -24,22 +25,16 @@ function resolverImagem(nomeArquivo: string) {
 			produtos.map((produto) => {
 				const imagem = resolverImagem(produto.data.imagens[0]);
 				return (
-					<li>
-						<a href={`/produto/${produto.id}`}>
-							{imagem && (
-								<img
-									src={imagem.src}
-									width={imagem.width}
-									height={imagem.height}
-									alt={produto.data.nome}
-								/>
-							)}
-							<p>{produto.data.nome}</p>
-							<p>{produto.data.descricaoCurta}</p>
-							<p>R$ {produto.data.preco.toFixed(2)}</p>
-							<p>{produto.data.disponivel ? "Disponível" : "Indisponível"}</p>
-						</a>
-					</li>
+					<ProdutoCard
+						slug={produto.id}
+						nome={produto.data.nome}
+						descricaoCurta={produto.data.descricaoCurta}
+						preco={produto.data.preco}
+						disponivel={produto.data.disponivel}
+						imagemSrc={imagem?.src}
+						imagemWidth={imagem?.width}
+						imagemHeight={imagem?.height}
+					/>
 				);
 			})
 		}

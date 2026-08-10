@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# cópias de trabalho isoladas de sub-agentes (artefato de execução, não conteúdo do projeto)
+.claude/worktrees/

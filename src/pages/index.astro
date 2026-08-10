@@ -1,13 +1,54 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ProdutoCard from "../components/produto/ProdutoCard.astro";
+import VitrineVideos from "../components/home/VitrineVideos.astro";
+import Hero from "../components/home/Hero.astro";
+
+const produtos = await getCollection("produtos");
+const carrosChefe = produtos.filter((produto) => produto.data.destaqueHome);
+
+const imagensDisponiveis = import.meta.glob<{ default: ImageMetadata }>(
+	"/src/assets/produtos/*",
+	{ eager: true },
+);
+
+function resolverImagem(nomeArquivo: string) {
+	return imagensDisponiveis[`/src/assets/produtos/${nomeArquivo}`]?.default;
+}
 ---
 
 <BaseLayout title="Início">
-	<h1>Início</h1>
+	<!-- Seção 1: Hero (o <h1> da página vive dentro do Hero, não duplicado aqui) -->
+	<Hero />
 
-	<!-- Seção 1: Hero (produto em 3D — Fase 6) -->
-	<!-- Seção 2: Vitrine de vídeos (GSAP/ScrollTrigger, sem CTA — Fase 5) -->
-	<!-- Seção 3: Carros-chefe (produtos destaqueHome — Fase 2) -->
+	<!-- Seção 2: Vitrine de vídeos -->
+	<VitrineVideos />
+
+	<!-- Seção 3: Carros-chefe -->
+	<section>
+		<h2>Carros-chefe</h2>
+		<ul>
+			{
+				carrosChefe.map((produto) => {
+					const imagem = resolverImagem(produto.data.imagens[0]);
+					return (
+						<ProdutoCard
+							slug={produto.id}
+							nome={produto.data.nome}
+							descricaoCurta={produto.data.descricaoCurta}
+							preco={produto.data.preco}
+							disponivel={produto.data.disponivel}
+							imagemSrc={imagem?.src}
+							imagemWidth={imagem?.width}
+							imagemHeight={imagem?.height}
+						/>
+					);
+				})
+			}
+		</ul>
+	</section>
+
 	<!-- Seção 4: Prova social -->
 	<!-- Seção 5: Teaser Nossa História -->
 	<!-- Seção 6: CTA final + rodapé -->
