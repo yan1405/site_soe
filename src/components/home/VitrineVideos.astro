@@ -1,54 +1,107 @@
 ---
-// Vitrine de vídeos — ilustração visual pura, SEM CTA (ver CLAUDE.md,
-// "Arquitetura confirmada"). Arquivos finais da Fase 8 (public/videos/):
-// recorte 8–10s, CRF 26, H.264 único — ver PROGRESS.md, seção Fase 8, para
-// a tabela de antes/depois. Substituídos os placeholders brutos da Fase 5
-// (public/videos-raw/, removido).
+// Vitrine de vídeos — reconstrução 2026-08-14 (pedido direto do Yan, fora
+// da numeração de fases). Até aqui era um grid estático de 3 vídeos com
+// fade-reveal por scroll (Fase 5, formato que o CLAUDE.md registrava como
+// "o que o Yan disse gostar"). Substituído por decisão explícita do Yan
+// (confirmada antes de implementar, ver PROGRESS.md) por uma animação de
+// leque + esteira horizontal infinita, portada de um protótipo GSAP que o
+// próprio Yan trouxe pronto (feito no Gemini, arquivo reels_animation.html).
 //
-// prova-social-scrunchies.mp4 (ex-Video_by_soefloripa.mp4) fica DE FORA da
-// vitrine principal de propósito — está em 360×640, abaixo do mínimo de
-// 720p que o ORQUESTRACAO_PROMPTS_SOE.md exige para vídeo "em destaque";
-// entra só na seção de prova social (ainda não construída) quando existir.
+// O que foi adaptado do protótipo, e por quê:
+// - Tailwind via <script src="cdn.tailwindcss.com"> → removido; o projeto já
+//   usa Tailwind v4 local (@tailwindcss/vite), então as classes do protótipo
+//   viraram utilitárias do config real do projeto.
+// - Cores placeholder (bg-blue-900, bg-emerald-900 etc., uma por card) →
+//   removidas por completo. Não fazia sentido adaptar as cores porque os
+//   cards do protótipo eram <div> de cor sólida representando vídeo; aqui
+//   viraram <video> de verdade, então a cor de fundo (creme-300) só aparece
+//   como placeholder atrás do poster antes do vídeo carregar.
+// - Copy "Casos de Sucesso" / "Vídeo Cliente N" / "Reel Publicado" → são
+//   placeholders de um contexto de agência (mostrando trabalho pra
+//   clientes), fora do tom da SOE e, no caso do contador "Publicado",
+//   um dado que seria fabricado se ficasse (nenhum vídeo da SOE é
+//   publicado como "reel" em lugar nenhum específico). Trocado por
+//   legendas curtas e reais, no mesmo estilo dos aria-label que os vídeos
+//   já tinham antes desta reconstrução.
+// - Botão de play falso sobreposto → removido: os vídeos aqui tocam sozinhos
+//   (mudos, em loop) assim que entram na viewport, então um ícone de "play"
+//   sugeriria uma interação que não existe.
+// - GSAP/ScrollTrigger via CDN + gsap.registerPlugin solto no
+//   DOMContentLoaded → importados como módulo npm dentro do <script> do
+//   Astro, igual o resto do projeto já fazia aqui.
+// - Só 3 vídeos reais existem no formato certo pro efeito (720×1280,
+//   vertical) — prova-social-scrunchies.mp4 fica de fora de propósito,
+//   mesma razão de sempre (360×640, abaixo do mínimo de 720p documentado
+//   pro ORQUESTRACAO_PROMPTS_SOE.md, ver seção "Prova social" em
+//   index.astro). Os 3 são triplicados (9 cards no DOM) só pra garantir loop
+//   sem buraco visual, igual a técnica do protótipo original.
+// - prefers-reduced-motion: nenhuma animação de leque nem esteira automática
+//   roda. Em vez de só "congelar" os vídeos numa posição, a fita vira
+//   rolável manualmente (mesmo padrão .carrossel-scroll já usado nos
+//   Carros-chefe da Home) — alternativa real de navegação, não só ausência
+//   de movimento.
+// - Bandwidth: com 9 elementos <video> no DOM (vs. 3 antes), tocar todos ao
+//   mesmo tempo pagaria banda mesmo fora da tela. Um IntersectionObserver
+//   por card só chama .play() enquanto ele está de fato visível
+//   horizontalmente, e pausa ao sair — mesmo princípio do achado de
+//   performance da Fase 9 (ver comentário antigo preservado no histórico do
+//   git), aplicado à nova estrutura.
 const videos = [
 	{
 		src: "/videos/embalagem-artesanal.mp4",
 		poster: "/images/poster-embalagem-artesanal.jpg",
+		legenda: "Embalagem à mão",
 		aria: "Vídeo mostrando o processo de embalar laços à mão em caixinha de presente da SOE Acessórios",
 	},
 	{
 		src: "/videos/vitrine-experimente-tamanhos.mp4",
 		poster: "/images/poster-vitrine-experimente-tamanhos.jpg",
+		legenda: "Experimente o tamanho",
 		aria: "Vídeo mostrando os diferentes tamanhos de scrunchies da SOE Acessórios sendo usados no cabelo",
 	},
 	{
 		src: "/videos/vitrine-feira.mp4",
 		poster: "/images/poster-vitrine-feira.jpg",
+		legenda: "Na feira",
 		aria: "Vídeo mostrando a barraca da SOE Acessórios em uma feira, com os produtos expostos",
 	},
 ];
+
+// Triplicado pra garantir loop sem buraco (mesma técnica do protótipo) — o
+// z-index decrescente empilha visualmente o card 0 por cima do 1, o 1 por
+// cima do 2 etc., criando o efeito de "baralho" na animação de entrada.
+const videosTriplicados = [...videos, ...videos, ...videos].map((video, indice) => ({
+	...video,
+	indice,
+}));
 ---
 
-<section class="vitrine-videos bg-white py-16" aria-label="Vitrine de vídeos SOE Acessórios">
+<section id="vitrine-videos" class="vitrine-videos bg-white py-16" aria-label="Vitrine de vídeos SOE Acessórios">
 	<div class="mx-auto max-w-6xl px-6">
-		<!-- Remodelagem 2026-08-10 (design-dna.json v2): a seção não tinha
-		     nenhum texto de contexto, só os 3 vídeos soltos. Adicionado título
-		     (sem CTA — continua ilustração visual pura, ver CLAUDE.md,
-		     "Vitrine de vídeos") e um fundo branco pra criar o bloco de cor
-		     alternado (creme→branco→creme) que substitui sombra como
-		     separador de seção. A lógica de animação em si (fade sutil,
-		     revelação por scroll) é a que o Yan disse gostar e continua
-		     idêntica, só a moldura visual ao redor mudou.
-		     Correção 2026-08-10: a primeira versão tinha um rótulo "Do nosso
-		     ateliê" acima do título — removido, achado real do
-		     `impeccable detect` (kicker-above-heading), ver Hero.astro. -->
 		<h2 class="text-carvao-900">Do nosso ateliê: o bastidor de quem faz</h2>
+	</div>
 
-		<ul class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+	<div id="vitrine-viewport" class="relative mt-10 w-full overflow-hidden">
+		<div
+			class="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-white to-transparent sm:w-24"
+			aria-hidden="true"
+		>
+		</div>
+		<div
+			class="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-white to-transparent sm:w-24"
+			aria-hidden="true"
+		>
+		</div>
+
+		<ul id="vitrine-track" class="flex w-max gap-6 px-6">
 			{
-				videos.map((video) => (
-					<li class="overflow-hidden rounded-xl bg-creme-300">
+				videosTriplicados.map((video) => (
+					<li
+						class="vitrine-card relative h-[455px] w-64 shrink-0 list-none overflow-hidden rounded-2xl border border-carvao-900/10 bg-creme-300 shadow-medium"
+						style={`z-index: ${100 - video.indice}`}
+					>
 						<video
-							class="vitrine-video aspect-[9/16] w-full object-cover"
+							class="h-full w-full object-cover"
 							src={video.src}
 							poster={video.poster}
 							muted
@@ -57,6 +110,14 @@ const videos = [
 							preload="none"
 							aria-label={video.aria}
 						/>
+						<div
+							class="pointer-events-none absolute inset-0 bg-gradient-to-t from-carvao-900/85 via-carvao-900/10 to-transparent"
+							aria-hidden="true"
+						>
+						</div>
+						<p class="absolute bottom-5 left-5 right-5 font-heading text-base font-medium text-creme-50">
+							{video.legenda}
+						</p>
 					</li>
 				))
 			}
@@ -70,61 +131,91 @@ const videos = [
 
 	gsap.registerPlugin(ScrollTrigger);
 
-	const videos = gsap.utils.toArray<HTMLVideoElement>(".vitrine-video");
+	const viewport = document.getElementById("vitrine-viewport");
+	const track = document.getElementById("vitrine-track");
+	const cards = gsap.utils.toArray<HTMLElement>(".vitrine-card");
 	const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-	// Achado de performance do audit da Fase 9: antes, o atributo `autoplay`
-	// no <video> fazia o navegador baixar/tocar os 3 vídeos assim que
-	// entravam no DOM, mesmo escondidos por opacity:0 — pagando a banda
-	// inteira antes do scroll-reveal. Agora o play() só dispara junto com a
-	// revelação visual, dentro do mesmo callback.
 	function tocarVideo(video: HTMLVideoElement) {
 		video.play().catch(() => {
-			// Autoplay de vídeo mudo é permitido pela maioria dos navegadores,
-			// mas se algum bloquear mesmo assim, falha silenciosa é aceitável
-			// aqui — é ilustração decorativa, não conteúdo essencial.
+			// Autoplay de vídeo mudo é permitido pela maioria dos navegadores;
+			// falha silenciosa é aceitável aqui, é ilustração decorativa.
 		});
 	}
 
-	if (prefersReducedMotion) {
-		// Requisito não-negociável do CLAUDE.md: com a preferência ativada,
-		// os vídeos aparecem direto, sem animação de entrada (mas ainda tocam
-		// — são mudos/decorativos, não a categoria de movimento que a
-		// preferência pretende barrar).
-		gsap.set(videos, { opacity: 1, scale: 1, y: 0 });
-		videos.forEach(tocarVideo);
-	} else {
-		gsap.set(videos, { opacity: 0, scale: 0.92, y: 24 });
+	// Só toca o vídeo de um card enquanto ele está de fato visível
+	// horizontalmente — evita pagar banda dos 9 clones ao mesmo tempo.
+	const observador = new IntersectionObserver(
+		(entradas) => {
+			for (const entrada of entradas) {
+				const video = entrada.target.querySelector("video");
+				if (!(video instanceof HTMLVideoElement)) continue;
+				if (entrada.isIntersecting) {
+					tocarVideo(video);
+				} else {
+					video.pause();
+				}
+			}
+		},
+		{ threshold: 0.15 },
+	);
+	cards.forEach((card) => observador.observe(card as Element));
 
-		// Padrão da sub-skill gsap-scrolltrigger para revelar vários elementos
-		// semelhantes ao entrarem no viewport: ScrollTrigger.batch(), com
-		// stagger no callback onEnter — alternativa recomendada a IntersectionObserver.
-		ScrollTrigger.batch(".vitrine-video", {
-			start: "top 80%", // mesmo trigger point do design-dna.json (viewport 80%)
-			once: true, // dispara uma vez ao entrar, não-scrubbed — ver design-dna.json
-			onEnter: (elementos) => {
-				gsap.to(elementos, {
-					opacity: 1,
-					scale: 1,
-					y: 0,
-					duration: 0.8,
-					ease: "power2.out",
-					stagger: 0.15,
-				});
-				elementos.forEach((elemento) => {
-					if (elemento instanceof HTMLVideoElement) tocarVideo(elemento);
-				});
+	if (prefersReducedMotion || !track || !viewport) {
+		// Requisito não-negociável do CLAUDE.md: com a preferência ativada,
+		// nenhuma animação de leque nem esteira automática roda. Em vez de só
+		// deixar tudo parado, a fita vira rolável manualmente (mesmo padrão
+		// .carrossel-scroll dos Carros-chefe) — uma forma real de navegar
+		// pelos vídeos, não só ausência de movimento.
+		viewport?.classList.remove("overflow-hidden");
+		viewport?.classList.add("carrossel-scroll", "overflow-x-auto");
+		cards.forEach((card) => (card as HTMLElement).classList.add("carrossel-item"));
+		gsap.set(cards, { opacity: 1, x: 0, scale: 1, rotationY: 0 });
+	} else {
+		const LARGURA_ITEM = 256; // w-64 do Tailwind
+		const GAP = 24; // gap-6 do Tailwind
+		const itensPorConjunto = cards.length / 3;
+		const larguraConjunto = (LARGURA_ITEM + GAP) * itensPorConjunto;
+
+		const tl = gsap.timeline({
+			scrollTrigger: {
+				trigger: "#vitrine-videos",
+				start: "top 70%",
+				toggleActions: "play none none none",
 			},
 		});
 
-		// Achado real da re-crítica da Fase 9.5 (Assessment A, reproduzido 2x
-		// na mesma sessão): o vídeo às vezes não tocava nunca, sem nenhum
-		// request de rede disparado — sintoma clássico do ScrollTrigger
-		// calculando a posição do trigger ("top 80%") ANTES das fontes
-		// self-hospedadas (Fase 9.5, font-display:swap) terminarem de
-		// carregar e empurrarem o layout. threejs-scrolltrigger/gsap-scrolltrigger
-		// já avisa pra isso: "Call ScrollTrigger.refresh() after DOM/layout
-		// changes... fonts loaded". Não estava sendo feito — corrigido aqui.
+		// A) Entrada em leque: cada card sai de trás do primeiro, com leve
+		// rotação 3D — mesma lógica do protótipo do Yan.
+		tl.from(cards, {
+			x: (indice) => -(indice * (LARGURA_ITEM + GAP)),
+			opacity: 0,
+			scale: 0.85,
+			rotationY: 25,
+			duration: 1.3,
+			stagger: 0.06,
+			ease: "power3.out",
+			transformOrigin: "left center",
+		});
+
+		// B) Esteira contínua: move a faixa pra esquerda pela largura de 1
+		// conjunto e repete infinitamente — como os 3 conjuntos são idênticos,
+		// o "salto" de volta a x:0 é imperceptível.
+		tl.to(
+			track,
+			{
+				x: -larguraConjunto,
+				duration: 22,
+				ease: "none",
+				repeat: -1,
+			},
+			"<",
+		);
+
+		// Mesmo achado real da Fase 9.5: ScrollTrigger pode calcular a posição
+		// do trigger antes das fontes self-hospedadas terminarem de carregar e
+		// empurrarem o layout — refresh depois que tudo carrega evita o
+		// vídeo/trigger nunca disparar.
 		document.fonts?.ready.then(() => ScrollTrigger.refresh());
 		window.addEventListener("load", () => ScrollTrigger.refresh());
 	}

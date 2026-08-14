@@ -52,7 +52,7 @@ import { NUMERO_WHATSAPP_PENDENTE } from "../lib/config";
 
 		if (itens.length === 0) {
 			const vazio = document.createElement("li");
-			vazio.textContent = "Seu carrinho está vazio — que tal dar uma olhada no catálogo?";
+			vazio.textContent = "Seu carrinho está vazio. Que tal dar uma olhada no catálogo?";
 			vazio.className = "text-carvao-700";
 			lista.append(vazio);
 		}
@@ -63,7 +63,7 @@ import { NUMERO_WHATSAPP_PENDENTE } from "../lib/config";
 
 			const info = document.createElement("span");
 			info.className = "text-carvao-900";
-			info.textContent = `${item.quantidade}x ${item.nome} — ${formatarPreco(item.preco * item.quantidade)}`;
+			info.textContent = `${item.quantidade}x ${item.nome}: ${formatarPreco(item.preco * item.quantidade)}`;
 
 			const botaoRemover = document.createElement("button");
 			botaoRemover.type = "button";

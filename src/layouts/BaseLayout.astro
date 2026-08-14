@@ -12,7 +12,7 @@ interface Props {
 
 const {
 	title,
-	description = "SOE Acessórios — acessórios de cabelo artesanais, feitos à mão.",
+	description = "SOE Acessórios: acessórios de cabelo artesanais, feitos à mão.",
 } = Astro.props;
 ---
 
@@ -26,11 +26,11 @@ const {
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#F5F0E4" />
 
-		<title>{title} — SOE Acessórios</title>
+		<title>{title} · SOE Acessórios</title>
 		<meta name="description" content={description} />
 
 		<!-- Open Graph básico -->
-		<meta property="og:title" content={`${title} — SOE Acessórios`} />
+		<meta property="og:title" content={`${title} · SOE Acessórios`} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
 		<meta property="og:locale" content="pt_BR" />

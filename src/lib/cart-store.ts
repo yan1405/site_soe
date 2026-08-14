@@ -60,7 +60,7 @@ export function gerarMensagemWhatsApp(): string {
 
 	const linhas = itens.map(
 		(item) =>
-			`${item.quantidade}x ${item.nome} — ${formatarPreco(item.preco * item.quantidade)}`,
+			`${item.quantidade}x ${item.nome}: ${formatarPreco(item.preco * item.quantidade)}`,
 	);
 	const total = itens.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
 

@@ -3,27 +3,34 @@
 // Extensão do tema — não sobrescreve as cores padrão do Tailwind.
 //
 // Remodelagem 2026-08-10 (design-dna.json v2, ver decision_log): tipografia
-// deixa de usar Playfair Display como fonte de heading padrão. Motivo real,
-// não estético: a extração de Design DNA de um site de referência real
-// (design-dna-atelieno-referencia.json, medido via computed style ao vivo)
-// mostrou que hierarquia tipográfica em sites do mesmo território de marca
-// vem de peso/escala, não de mistura serifada/sans — a suposição original
-// "script/serifada elegante" nunca teve evidência (v1 marcava isso como
-// INFERIDO). "Work Sans" (já licenciada e self-hospedada no projeto) agora
-// cobre heading (700-800) e corpo (300-400) na mesma família — cor e tom de
-// voz continuam 100% da SOE, nada da referência entrou aí.
-
+// deixou de usar Playfair Display como fonte de heading padrão, com base na
+// extração de Design DNA de um site de referência real
+// (design-dna-atelieno-referencia.json). "Work Sans" cobriu heading e corpo
+// na mesma família até 2026-08-14.
+//
+// Remodelagem 2026-08-14 (pedido direto do Yan, não inferido): "quero uma
+// fonte muito mais elegante" reabre essa decisão — agora por escolha
+// explícita do cliente, que tem prioridade sobre a leitura da referência.
+// Duas rodadas na mesma sessão: heading foi pra "Fraunces" primeiro, mas o
+// `impeccable detect` (mesma verificação real da Fase 11) acusou
+// 'overused-font' — Fraunces está hardcoded na lista de fontes que "cada
+// nova leva de UI gerada por IA converge". Trocado antes de entregar pra
+// "Playfair Display" (não está na lista, já self-hospedada no projeto desde
+// a Fase 9.5). Work Sans continua no corpo. Ver decision_log em
+// design-dna.json pro raciocínio completo, incluindo um bug incidental
+// corrigido de graça no arquivo de fonte itálico.
 /** @type {import('tailwindcss').Config} */
 export default {
 	content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
 	theme: {
 		extend: {
 			fontFamily: {
-				heading: ['"Work Sans"', "-apple-system", "Segoe UI", "sans-serif"],
+				heading: ['"Playfair Display Variable"', "Georgia", "serif"],
 				body: ['"Work Sans"', "-apple-system", "Segoe UI", "sans-serif"],
 				// Acento decorativo raríssimo (citação, olho do Hero) — nunca heading
-				// padrão nem corpo de texto. Ver design-dna.json v2, decision_log.
-				acento: ['"Playfair Display"', "Georgia", "serif"],
+				// padrão nem corpo de texto. Mesma família do heading agora
+				// (Playfair Display itálico). Ver decision_log.
+				acento: ['"Playfair Display Variable"', "Georgia", "serif"],
 			},
 			// Sombras com o mesmo rgba tingido de carvão do design-dna.json —
 			// nunca preto puro genérico. Uso rebaixado a elementos flutuantes

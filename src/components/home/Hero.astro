@@ -1,69 +1,143 @@
 ---
-// Hero da home: imagem estática do produto, sozinha (LCP).
+// Hero da home — reconstrução 2026-08-14, pedido direto do Yan (fora da
+// numeração de fases). Substitui por completo a versão anterior (texto
+// lateral + container com foto de um laço), que já tinha 3 gerações
+// documentadas aqui (Fase 3: negative-space; Fase 9.6: remoção do Hero 3D;
+// remodelagem 2026-08-10: hierarquia de texto invertida). Ver PROGRESS.md
+// e design-dna.json (decision_log) para o histórico completo.
 //
-// Fase 9.6 (2026-08-10): o Hero 3D (Three.js) foi removido por decisão do
-// Yan — não é retomar experimentação, é alinhar com o que o próprio
-// design-dna.json (Fase 3, extraído das fotos reais) já documentava:
-// `visual_language.focal_strategy: "single hero element"` e
-// `composition.negative_space_role: "protagonista"`. Ver CLAUDE.md.
-//
-// Remodelagem 2026-08-10 (design-dna.json v2): hierarquia do texto invertida
-// — antes o <h1> era literalmente "SOE Acessórios" (o nome da marca, que já
-// aparece no Header/Logo) e a proposta de valor ficava rebaixada a parágrafo.
-// Agora o <h1> carrega a proposta de valor (o que um heading deve fazer).
-//
-// Correção 2026-08-10 (rodada real do impeccable, ver PROGRESS.md): a
-// primeira versão desta remodelagem colocava um rótulo pequeno em versalete
-// acima do <h1> ("SOE Acessórios · Feito à mão de ateliê"). O
-// `impeccable detect` (achado real, não hipotético) marcou esse padrão como
-// "kicker-above-heading" — um tell de UI gerada por IA, banido mesmo que
-// bonito. Removido aqui e nas outras 5 ocorrências do site; a informação que
-// o rótulo carregava foi incorporada no parágrafo de apoio abaixo.
-import { getCollection } from "astro:content";
+// Fundo em movimento: slideshow Ken Burns (zoom/pan lento com crossfade,
+// CSS puro) sobre 3 fotos reais já corrigidas de src/assets/produtos/ —
+// as mesmas usadas nos cards de produto, não fotos novas nem de fora do
+// projeto. Nenhum vídeo entrou aqui: os 4 vídeos que o site tem são todos
+// verticais (720×1280, ver public/videos/), formato que não cobre bem uma
+// tela larga; usar um deles esticado ficaria borrado, e os 3 utilizáveis já
+// aparecem na seção seguinte (agora reels de esteira infinita, ver
+// VitrineVideos.astro), o que duplicaria o mesmo clipe duas vezes seguidas.
+// Overlay escuro + blur leve por cima dão contraste ao texto (h1 + parágrafo
+// centralizados + 2 CTAs), sem depender de peso de fonte pesado pra isso.
+import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
 
-const produtos = await getCollection("produtos");
-const produtoHero = produtos.find((p) => p.data.destaqueHome) ?? produtos[0];
-
-const imagensDisponiveis = import.meta.glob<{ default: ImageMetadata }>(
+const fotosDisponiveis = import.meta.glob<{ default: ImageMetadata }>(
 	"/src/assets/produtos/*",
 	{ eager: true },
 );
-const imagemHero = produtoHero
-	? imagensDisponiveis[`/src/assets/produtos/${produtoHero.data.imagens[0]}`]?.default
-	: undefined;
+
+// Ordem escolhida pra variar cor/padrão entre os 3 quadros do slideshow
+// (outono quente → verde → bege neutro) — as 5 fotos corrigidas disponíveis
+// em src/assets/produtos/ são as mesmas usadas nos cards de produto em todo
+// o site, então o fundo do Hero fica com a mesma cor real do resto, sem
+// puxar de analise_acessts/fundo_uniformizado (que tem 2 fotos a mais, mas
+// sem a correção de branco/exposição já aplicada nas demais).
+const ordemFundo = ["laco_linho_bordado_outono.jpg", "laco_linho_verde.jpg", "quadriculado_bege.jpg"];
+
+const imagensFundo = ordemFundo
+	.map((nome) => fotosDisponiveis[`/src/assets/produtos/${nome}`]?.default)
+	.filter((imagem): imagem is ImageMetadata => Boolean(imagem));
+
+const mensagemWhatsAppHero = encodeURIComponent(
+	"Olá! Vi o site da SOE e queria ver o catálogo completo.",
+);
 ---
 
-<section class="hero mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-24" aria-label="Produto em destaque">
-	<div class="hero-copy order-2 flex flex-col gap-4 md:order-1">
-		<h1 class="text-carvao-900">
-			Acessórios de cabelo artesanais para quem faz questão do detalhe.
-		</h1>
-		<p class="max-w-sm text-lg text-carvao-700">
-			Feito à mão de ateliê: laços em linho bordados um a um, em pequenos lotes.
-		</p>
-		<a
-			href="/catalogo"
-			class="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-dourado-500 px-6 py-3 text-sm font-semibold text-carvao-900 shadow-low transition-shadow hover:shadow-medium"
-		>
-			Ver catálogo
-		</a>
-	</div>
-
-	<div class="hero-produto order-1 md:order-2">
+<section
+	id="hero"
+	class="hero relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-carvao-900"
+	aria-label="Apresentação SOE Acessórios"
+>
+	<div class="pointer-events-none absolute inset-0" aria-hidden="true">
 		{
-			imagemHero && (
+			imagensFundo.map((imagem, indice) => (
 				<img
-					id="hero-imagem-estatica"
-					src={imagemHero.src}
-					width={imagemHero.width}
-					height={imagemHero.height}
-					alt={produtoHero?.data.nome ?? "Produto SOE Acessórios"}
-					fetchpriority="high"
-					loading="eager"
-					decoding="sync"
-					class="w-full rounded-3xl bg-creme-300 object-cover shadow-medium"
+					src={imagem.src}
+					width={imagem.width}
+					height={imagem.height}
+					alt=""
+					fetchpriority={indice === 0 ? "high" : "low"}
+					loading={indice === 0 ? "eager" : "lazy"}
+					decoding="async"
+					data-hero-fundo
+					class:list={[
+						"hero-fundo-foto absolute inset-0 h-full w-full object-cover blur-[6px]",
+						indice === 0 && "hero-fundo-ativa",
+					]}
 				/>
-			)
+			))
 		}
 	</div>
+
+	<!-- Overlay escuro pra contraste WCAG AA do texto sobre o fundo em
+	     movimento. Gradiente de 4 pontos calibrado por medição real, não por
+	     olho: testei o pixel mais claro de fato presente nas 3 fotos usadas
+	     (branco puro do linho, 255/255/255) composto contra a opacidade do
+	     overlay na altura exata onde o H1 renderiza (medido via Playwright:
+	     ~66–77% da altura da seção, a partir da base) — com um overlay
+	     uniforme de 60/40% (primeira tentativa) o contraste ficava em
+	     2.77–3.14:1, abaixo do mínimo AA (3:1 pra texto grande, 4.5:1 pro
+	     restante). Os stops abaixo garantem >=70% de opacidade em toda a
+	     faixa vertical onde H1/parágrafo/botões existem (contraste real
+	     6.1–6.6:1 até contra branco puro), e só afinam pra 25% no topo da
+	     seção, onde não há texto nenhum — mantém a foto visível ali sem
+	     arriscar legibilidade onde importa. -->
+	<div
+		class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(46,42,36,0.92)_0%,rgba(46,42,36,0.86)_55%,rgba(46,42,36,0.72)_80%,rgba(46,42,36,0.25)_100%)]"
+		aria-hidden="true"
+	>
+	</div>
+
+	<div class="hero-copy relative z-10 mx-auto flex max-w-2xl flex-col items-center gap-6 px-6 py-24 text-center">
+		<h1 class="text-creme-50">
+			Acessórios de cabelo artesanais para quem faz questão do detalhe.
+		</h1>
+		<p class="max-w-md text-lg text-creme-200">
+			Feito à mão de ateliê: laços em linho bordados um a um, em pequenos lotes.
+		</p>
+
+		<div class="mt-2 flex flex-col items-center gap-3 sm:flex-row">
+			<a
+				href="#vitrine-videos"
+				class="inline-flex w-fit items-center gap-2 rounded-full border border-creme-100/70 px-6 py-3 text-sm font-semibold text-creme-50 transition-colors hover:bg-creme-50/10"
+			>
+				Saiba mais
+			</a>
+			<a
+				href={`https://wa.me/${NUMERO_WHATSAPP_PENDENTE}?text=${mensagemWhatsAppHero}`}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="inline-flex w-fit items-center gap-2 rounded-full bg-dourado-500 px-6 py-3 text-sm font-semibold text-carvao-900 shadow-low transition-shadow hover:shadow-medium"
+			>
+				Ver catálogo completo
+			</a>
+		</div>
+	</div>
 </section>
+
+<script>
+	// Alterna a classe .hero-fundo-ativa entre as fotos do slideshow — a
+	// animação de zoom/pan em si (hero-ken-burns) roda em CSS puro (ver
+	// global.css), este script só decide QUANDO trocar de foto e reinicia a
+	// animação a cada troca (removendo e recolocando a classe força o
+	// navegador a reiniciar o keyframe, em vez de continuar de onde parou).
+	const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	const fotos = Array.from(document.querySelectorAll<HTMLImageElement>("[data-hero-fundo]"));
+
+	// Requisito não-negociável do CLAUDE.md (mesmo já aplicado em
+	// VitrineVideos.astro): com prefers-reduced-motion, nenhuma animação de
+	// zoom/crossfade roda — a primeira foto fica só visível e parada (ela já
+	// nasce com a classe .hero-fundo-ativa no HTML, então não precisa de JS
+	// nenhum pra aparecer).
+	if (fotos.length > 1 && !prefersReducedMotion) {
+		const DURACAO_MS = 9000; // igual à duração de hero-ken-burns em global.css
+		let indiceAtual = 0;
+
+		setInterval(() => {
+			fotos[indiceAtual].classList.remove("hero-fundo-ativa");
+			indiceAtual = (indiceAtual + 1) % fotos.length;
+
+			const proxima = fotos[indiceAtual];
+			proxima.classList.remove("hero-fundo-ativa");
+			void proxima.offsetWidth; // força reflow pra reiniciar o keyframe CSS
+			proxima.classList.add("hero-fundo-ativa");
+		}, DURACAO_MS);
+	}
+</script>

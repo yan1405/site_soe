@@ -1,22 +1,54 @@
 @import "tailwindcss";
 @config "../../tailwind.config.mjs";
 
-/* Fontes reais, self-hospedadas em public/fonts/ (baixadas do Google Fonts e
-   servidas localmente — nunca via CDN nem fallback de fonte de sistema).
-   Arquivo único por família porque o Google serviu variable font (cobre todo
-   o eixo de peso 100–900 num arquivo só).
+/* Fontes reais, self-hospedadas em public/fonts/ (baixadas via
+   @fontsource-variable/* — mesmo arquivo OFL do Google Fonts, mas via
+   registro npm, porque fonts.googleapis.com não está na allowlist de rede
+   do sandbox onde esta troca foi feita — nunca via CDN nem fallback de
+   fonte de sistema).
 
-   Remodelagem 2026-08-10 (design-dna.json v2): Work Sans passa a cobrir
-   heading (700-800) e corpo (300-400) — Playfair Display deixa de ser fonte
-   de heading padrão e vira acento raríssimo (.acento-citacao), ver
-   decision_log em design-dna.json. Nenhuma fonte nova foi baixada — as duas
-   já eram licenciadas/self-hospedadas neste projeto desde a Fase 9.5. */
+   Remodelagem 2026-08-14 (pedido direto do Yan, fora da numeração de
+   fases): "quero uma fonte muito mais elegante" reabre a escolha da Fase 11
+   de usar só Work Sans em heading — ver decision_log em design-dna.json
+   para o raciocínio completo.
+
+   Duas rodadas nesta mesma sessão, não uma: a primeira trocou heading pra
+   "Fraunces". Rodei `impeccable detect` (mesma disciplina de verificação da
+   Fase 11) antes de considerar a fase pronta, e o próprio detector acusou
+   'overused-font' em Fraunces — está hardcoded numa lista de fontes que
+   "cada nova leva de UI gerada por IA converge" (o comentário no código-
+   fonte do detector cita literalmente "the Anthropic-skill / Vercel /
+   GitHub default wave"). Isso contradiz o motivo pelo qual a fonte foi
+   escolhida (elegância/distinção), então troquei de novo antes de entregar:
+   "Playfair Display" (não está na lista do detector, já era self-hospedada
+   no projeto desde a Fase 9.5 como acento raríssimo) agora cobre heading
+   também. Nenhuma fonte nova foi baixada além do peso 'normal' que faltava.
+
+   Achado incidental, corrigido de graça: o arquivo original
+   playfair-display-variable.woff2 (Fase 9.5) estava marcado como
+   `font-style: italic` no CSS, mas os bytes do arquivo são idênticos ao
+   peso NORMAL (roman) do Playfair Display, não ao itálico de verdade —
+   comparado por hash contra o pacote @fontsource-variable/playfair-display.
+   Ou seja: toda vez que .acento-citacao renderizou antes desta sessão, o
+   navegador provavelmente sintetizou um itálico falso (slant artificial)
+   em cima do peso reto, não o itálico real desenhado da fonte. Corrigido
+   aqui: o arquivo antigo agora é usado como NORMAL (está correto pra isso)
+   e um novo arquivo (playfair-display-italic-variable.woff2, baixado do
+   mesmo pacote) cobre o itálico de verdade. */
 @font-face {
-	font-family: "Playfair Display";
-	font-style: italic;
-	font-weight: 400 700;
+	font-family: "Playfair Display Variable";
+	font-style: normal;
+	font-weight: 400 900;
 	font-display: swap;
 	src: url("/fonts/playfair-display-variable.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Playfair Display Variable";
+	font-style: italic;
+	font-weight: 400 900;
+	font-display: swap;
+	src: url("/fonts/playfair-display-italic-variable.woff2") format("woff2");
 }
 
 @font-face {
@@ -28,10 +60,25 @@
 }
 
 /* Restaura a hierarquia tipográfica que o Preflight do Tailwind zera,
-   usando exatamente a escala do src/styles/design-dna.json (v2) — nenhum
-   valor inventado aqui. Contraste agora é por peso/escala (Work Sans 300
-   vs. 800), não por mistura de categoria de fonte — ver decision_log. */
+   usando a escala do src/styles/design-dna.json (v2, decision_log
+   atualizado em 2026-08-14) — nenhum valor inventado aqui. */
 @layer base {
+	/* Scroll suave pro botão "Saiba mais" do Hero (âncora até
+	   #vitrine-videos) — CSS puro, sem Lenis (citado no CLAUDE.md como parte
+	   do stack pretendido, mas nunca chegou a ser instalado; ver
+	   package.json). Desligado com prefers-reduced-motion porque
+	   scroll-behavior:smooth não é pausado automaticamente pelo navegador
+	   só por causa dessa preferência. */
+	html {
+		scroll-behavior: smooth;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+	}
+
 	body {
 		background-color: theme(--color-creme-100);
 		color: theme(--color-carvao-900);
@@ -47,31 +94,33 @@
 		letter-spacing: -0.01em;
 	}
 
+	/* Pesos diferentes da era Work Sans (800/700/700): Playfair Display é uma
+	   serifada de alto contraste (didona) — em 700+ ela já lê como "peso
+	   forte" por causa do próprio desenho da fonte (hastes finas x grossas),
+	   não precisa do mesmo peso numérico bruto que uma sans-serif geométrica
+	   pra parecer hierárquica. */
 	h1 {
 		font-size: 2.5rem; /* heading_1 */
-		font-weight: 800;
+		font-weight: 700;
 		line-height: 1.1;
 	}
 
 	h2 {
 		font-size: 2rem; /* heading_2 */
-		font-weight: 700;
+		font-weight: 600;
 		line-height: 1.15;
 	}
 
 	h3 {
 		font-size: 1.375rem; /* heading_3 */
-		font-weight: 700;
+		font-weight: 500;
 		line-height: 1.25;
 		letter-spacing: normal;
 	}
 
-	/* Medida de leitura confortável pros blocos de texto corrido. Ajustado
-	   2026-08-10 de 70ch pra 58ch — achado real do `impeccable detect`
-	   (line-length): mesmo a 70ch, a largura renderizada da Work Sans em
-	   1280px de viewport ainda produzia ~87-90 caracteres por linha (o
-	   caractere médio da fonte é mais estreito que "ch", que é calibrado no
-	   glyph "0") — acima dos <80 recomendados. 58ch resolve isso na prática. */
+	/* Medida de leitura confortável pros blocos de texto corrido. Ver
+	   histórico do ajuste de 70ch pra 58ch no decision_log de
+	   design-dna.json (achado real do `impeccable detect`, Fase 11). */
 	.medida-leitura {
 		max-width: 58ch;
 	}
@@ -79,9 +128,10 @@
 	/* Rótulo pequeno em versalete espaçado — mesmo papel do "heading_2"/
 	   "overline" medido na referência (design-dna-atelieno-referencia.json:
 	   ~14px, peso normal, maiúsculas, tracking largo), aplicado com a
-	   tipografia e cor da própria SOE. */
+	   tipografia e cor da própria SOE. Continua em Work Sans (peso bold),
+	   não em Fraunces — é rótulo utilitário, não heading. */
 	.rotulo-secao {
-		font-family: theme(--font-heading);
+		font-family: theme(--font-body);
 		font-size: 0.8125rem;
 		font-weight: 700;
 		letter-spacing: 0.12em;
@@ -89,8 +139,9 @@
 	}
 
 	/* Acento decorativo raríssimo — no máximo 1 por página (citação, olho do
-	   Hero). Ver design-dna.json v2, decision_log: mantém um traço "feito à
-	   mão" sem reintroduzir serifada como padrão de heading. */
+	   Hero). Continua Playfair Display itálico (agora o arquivo itálico de
+	   verdade, não mais o peso normal sintetizado — ver comentário no topo
+	   do arquivo), mesma família do heading agora. */
 	.acento-citacao {
 		font-family: theme(--font-acento);
 		font-style: italic;
@@ -112,6 +163,45 @@
 	@media (prefers-reduced-motion: reduce) {
 		.carrossel-scroll {
 			scroll-behavior: auto;
+		}
+	}
+
+	/* Hero 2026-08-14: slideshow Ken Burns (zoom/pan lento com crossfade)
+	   sobre fotos reais já corrigidas de src/assets/produtos/, cobrindo a
+	   tela inteira atrás do texto. Cada <img>.hero-fundo-foto começa
+	   invisível (opacity 0); o JS do Hero.astro alterna a classe
+	   .hero-fundo-ativa entre elas. A animação de escala/posição roda via
+	   CSS puro (sem GSAP aqui — é só zoom contínuo, não precisa de
+	   ScrollTrigger), then congela com prefers-reduced-motion. */
+	.hero-fundo-foto {
+		opacity: 0;
+		/* Escala-base > 1 (não 1.0) de propósito: com filter:blur() aplicado,
+		   uma imagem exatamente do tamanho do container pode deixar uma
+		   borda com sobra de desfoque perto da margem. Manter um overscan
+		   mínimo o tempo todo (mesmo antes da animação começar) evita isso
+		   em qualquer navegador. */
+		transform: scale(1.08);
+		transition: opacity 1.6s ease-in-out;
+	}
+
+	.hero-fundo-foto.hero-fundo-ativa {
+		opacity: 1;
+		animation: hero-ken-burns 9s ease-in-out forwards;
+	}
+
+	@keyframes hero-ken-burns {
+		from {
+			transform: scale(1.08) translate(0, 0);
+		}
+		to {
+			transform: scale(1.18) translate(-1%, -1%);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero-fundo-foto.hero-fundo-ativa {
+			animation: none;
+			transform: scale(1);
 		}
 	}
 }

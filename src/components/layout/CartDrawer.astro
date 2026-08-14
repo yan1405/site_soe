@@ -79,7 +79,7 @@ import { NUMERO_WHATSAPP_PENDENTE } from "../../lib/config";
 
 			const info = document.createElement("span");
 			info.className = "text-carvao-900";
-			info.textContent = `${item.quantidade}x ${item.nome} — ${formatarPreco(item.preco * item.quantidade)}`;
+			info.textContent = `${item.quantidade}x ${item.nome}: ${formatarPreco(item.preco * item.quantidade)}`;
 
 			const botaoRemover = document.createElement("button");
 			botaoRemover.type = "button";

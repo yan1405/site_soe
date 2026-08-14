@@ -22,9 +22,9 @@ export const NUMERO_WHATSAPP_PENDENTE = "5511900000000";
 // CNPJ fictício em formato de MEI (não corresponde a nenhuma empresa real —
 // não validado contra dígito verificador, é só um formato plausível para a
 // UI parar de mostrar texto de placeholder cru).
-export const CNPJ_FICTICIO = "48.163.905/0001-27 (MEI — fictício)";
+export const CNPJ_FICTICIO = "48.163.905/0001-27 (MEI, fictício)";
 
-export const ENDERECO_FICTICIO = "Rua das Orquídeas, 245 — Trindade, Florianópolis/SC — CEP 88036-000";
+export const ENDERECO_FICTICIO = "Rua das Orquídeas, 245, Trindade, Florianópolis/SC, CEP 88036-000";
 
 export const CIDADE_UF_FICTICIA = "Florianópolis/SC";
 
