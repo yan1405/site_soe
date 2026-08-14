@@ -1335,3 +1335,25 @@ Overlay: gradiente escuro de 4 pontos, calibrado por medição real de contraste
 **Commit e tentativa de push (2026-08-14, mesma sessão):** as mudanças acima foram commitadas localmente como `cfdec1a` ("Hero novo, fonte Playfair Display, esteira de vídeos, limpeza de travessões", 21 arquivos, 578 inserções / 276 remoções). Antes do commit, `git log` revelou um commit `12356f4` ("fix: corrige menu mobile do header (hamburguer) e faz auditoria de responsividade") já presente no histórico local e **já em `origin/main`** — não registrado neste arquivo até agora porque foi feito fora desta sessão Cowork (provavelmente na sessão local do Yan). `git log origin/main..HEAD` confirma que só `cfdec1a` ficou à frente do remoto depois do commit.
 
 `git push origin main` não foi possível a partir desta sessão: `git fetch origin` retornou `fatal: unable to access 'https://github.com/yan1405/site_soe.git/': Received HTTP code 403 from proxy after CONNECT` — o `device_bash` (execução no computador do Yan via ponte, usada para todo o trabalho de git desta sessão) não tem acesso de rede, limitação já documentada em sessões anteriores e confirmada de novo aqui, não presumida. `cfdec1a` está commitado no disco do Yan, mas só chega ao GitHub/Vercel com um `git push origin main` rodado por fora desta sessão (terminal local do Yan ou a sessão Claude Code local dele, que tem rede).
+
+## Correção pós-deploy (2026-08-14, mesma sessão) — parágrafo do Hero ilegível em produção
+
+O Yan reportou (com screenshot do site já publicado) que o parágrafo do Hero estava quase invisível, um "fantasma" escuro sobre o fundo escuro, enquanto o H1 acima tinha contraste perfeito.
+
+**Causa raiz identificada, não suposta:** o parágrafo usava a classe `text-creme-200`. A escala `creme` no `tailwind.config.mjs` só define os tons `50/100/300/500/700/900` — não existe `200`. O Tailwind não gera nenhum CSS para uma classe de tom inexistente, então o navegador não falha visivelmente: o parágrafo simplesmente não recebe nenhuma cor de texto da classe e herda a cor padrão do `body` (`color: theme(--color-carvao-900)`, `#2E2A24`, quase preto) — que por acaso é da mesma família cromática do overlay escuro do Hero (`rgba(46,42,36,X)`), daí o efeito "fantasma": texto escuro sobre fundo escuro da mesma cor-base.
+
+**Verificação de escopo:** rodei `grep -rEon` em todo `src/` por qualquer utilitário `(text|bg|border|from|via|to|ring|fill|stroke|decoration)-<cor customizada>-<número>` e cruzei cada ocorrência com os tons realmente definidos no `tailwind.config.mjs`. Único caso inválido no projeto inteiro: este.
+
+**Correção:** `text-creme-200` → `text-creme-100` (`#F5F0E4`, tom real e válido da escala, mais escuro que o `creme-50` do H1 — preserva a hierarquia visual pretendida entre título e parágrafo).
+
+**Verificação real pós-correção** (rebuild completo no sandbox, mesmo ambiente desta sessão):
+- `astro build`: 14 páginas, sem erro.
+- `astro check`: 0 erros, 0 warnings novos.
+- Contraste calculado matematicamente (mesma metodologia da entrega original: Playwright pra posição real de cada elemento + Pillow), contra o pior pixel teórico (branco puro, 255/255/255) na altura exata onde cada elemento renderiza:
+  - Parágrafo: 8.22:1 (desktop) / 8.36:1 (mobile) — mínimo AA exigido: 4.5:1.
+  - Botão "Saiba mais": 9.18:1 (desktop) / 9.41:1 (mobile).
+  - H1 (reconfirmado): 8.07:1 (desktop) / 7.27:1 (mobile).
+- Contraste também medido em pixel real do screenshot renderizado (não só no cenário teórico adversarial): 9.25–9.99:1, todos acima até do limiar AAA (7:1) pra texto normal.
+- Screenshot real conferido visualmente: parágrafo nítido e legível.
+
+Esse achado expõe uma lacuna na verificação da sessão anterior: o cálculo de contraste original só cobriu o H1 explicitamente — o parágrafo foi assumido como coberto pelo mesmo raciocínio de opacidade do overlay, mas o bug real (classe de cor inexistente) não seria pego por aquela verificação de qualquer forma, porque não é um problema de opacidade do overlay, é ausência total de cor no elemento. **Lição:** verificar contraste em CADA elemento de texto individualmente (cor computada real via `getComputedStyle`, não assumida a partir do nome da classe), não só no elemento mais proeminente.
